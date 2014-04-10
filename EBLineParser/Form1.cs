@@ -13,216 +13,98 @@ namespace EBLineParser
 {
     public partial class Form1 : Form
     {
-        private char[] AllChars;
-        private int[] AllWidths;
-        private int lineSize;
-        private string inputFile;
-        private string AllCharsString;
+
+        private ebline lineCalc;
+        private string[] rows = new string[3] { "", "", "" };
 
         public Form1()
         {
-            inputFile = "widths.yml";
-            lineSize = 30;
+            lineCalc = new ebline();
             InitializeComponent();
-            characterInitializer();
-            readWidths();
+            lineCalc.readWidths();
         }
 
         public Form1(string aFile)
         {
-            inputFile = aFile;
-            lineSize = 30;
+            lineCalc = new ebline(aFile);
             InitializeComponent();
-            characterInitializer();
-            readWidths();
+            lineCalc.readWidths();
         }
 
         public Form1(string aFile, int aSize)
         {
-            inputFile = aFile;
-            lineSize = aSize;
+            lineCalc = new ebline(aFile, aSize);
             InitializeComponent();
-            characterInitializer();
-            readWidths();
+            lineCalc.readWidths();
         }
 
         public Form1(int aSize)
         {
-            inputFile = "widths.yml";
-            lineSize = aSize;
+            lineCalc = new ebline(aSize);
             InitializeComponent();
-            characterInitializer();
-            readWidths();
+            lineCalc.readWidths();
         }
 
-
-        private void characterInitializer()
-        {
-            AllChars = new char[96];
-            
-            AllChars[0] = ' ';
-            AllChars[1] = '!';
-            AllChars[2] = '"';
-            AllChars[3] = '#';
-            AllChars[4] = '$';
-            AllChars[5] = '%';
-            AllChars[6] = '&';
-            AllChars[7] = '\'';
-            AllChars[8] = '(';
-            AllChars[9] = ')';
-            AllChars[10] = '*';
-            AllChars[11] = '+';
-            AllChars[12] = ',';
-            AllChars[13] = '-';
-            AllChars[14] = '.';
-            AllChars[15] = '/';
-            AllChars[16] = '0';
-            AllChars[17] = '1';
-            AllChars[18] = '2';
-            AllChars[19] = '3';
-            AllChars[20] = '4';
-            AllChars[21] = '5';
-            AllChars[22] = '6';
-            AllChars[23] = '7';
-            AllChars[24] = '8';
-            AllChars[25] = '9';
-            AllChars[26] = ':';
-            AllChars[27] = ';';
-            AllChars[28] = '<';
-            AllChars[29] = '=';
-            AllChars[30] = '>';
-            AllChars[31] = '?';
-            AllChars[32] = '@';
-            AllChars[33] = 'A';
-            AllChars[34] = 'B';
-            AllChars[35] = 'C';
-            AllChars[36] = 'D';
-            AllChars[37] = 'E';
-            AllChars[38] = 'F';
-            AllChars[39] = 'G';
-            AllChars[40] = 'H';
-            AllChars[41] = 'I';
-            AllChars[42] = 'J';
-            AllChars[43] = 'K';
-            AllChars[44] = 'L';
-            AllChars[45] = 'M';
-            AllChars[46] = 'N';
-            AllChars[47] = 'O';
-            AllChars[48] = 'P';
-            AllChars[49] = 'Q';
-            AllChars[50] = 'R';
-            AllChars[51] = 'S';
-            AllChars[52] = 'T';
-            AllChars[53] = 'U';
-            AllChars[54] = 'V';
-            AllChars[55] = 'W';
-            AllChars[56] = 'X';
-            AllChars[57] = 'Y';
-            AllChars[58] = 'Z';
-            AllChars[59] = '[';
-            AllChars[60] = '\\';
-            AllChars[61] = ']';
-            AllChars[62] = '^';
-            AllChars[63] = '_';
-            AllChars[64] = '`';
-            AllChars[65] = 'a';
-            AllChars[66] = 'b';
-            AllChars[67] = 'c';
-            AllChars[68] = 'd';
-            AllChars[69] = 'e';
-            AllChars[70] = 'f';
-            AllChars[71] = 'g';
-            AllChars[72] = 'h';
-            AllChars[73] = 'i';
-            AllChars[74] = 'j';
-            AllChars[75] = 'k';
-            AllChars[76] = 'l';
-            AllChars[77] = 'm';
-            AllChars[78] = 'n';
-            AllChars[79] = 'o';
-            AllChars[80] = 'p';
-            AllChars[81] = 'q';
-            AllChars[82] = 'r';
-            AllChars[83] = 's';
-            AllChars[84] = 't';
-            AllChars[85] = 'u';
-            AllChars[86] = 'v';
-            AllChars[87] = 'w';
-            AllChars[88] = 'x';
-            AllChars[89] = 'y';
-            AllChars[90] = 'z';
-            AllChars[91] = '{';
-            AllChars[92] = '|';
-            AllChars[93] = '}';
-            AllChars[94] = '~';
-            AllChars[95] = '¬';
-
-            AllCharsString = charArraytoString(AllChars);
-        }
-
-        private void readWidths()
-        {
-            AllWidths = new int[96];
-            string line = "";
-            string subLine = "";
-            int counter = 0;
-
-            try
-            {
-                using (StreamReader sr = new StreamReader(inputFile))
-                {
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        subLine = line.Substring(line.IndexOf(':') + 1, line.Length - (line.IndexOf(':') + 1));
-                        subLine = subLine.Trim();
-                        AllWidths[counter] = Convert.ToInt32(subLine);
-                        counter++;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message, "The file " + inputFile + " could not be read:");
-            }
-        }
-
-        private string charArraytoString(char[] chars)
-        {
-            string outString = "";
-
-            for (int i = 0; i < chars.Length; i++)
-            {
-                outString = outString + "" + chars[i];
-            }
-
-            return outString;
-        }
-
-        private int calcStringSize(string aString)
-        {
-            int totalSize = 0;
-
-            foreach (char c in aString)
-            {
-                //The size of the character being used
-                totalSize += AllWidths[AllCharsString.IndexOf(c)];
-                //The padding between characters
-                totalSize += 1;
-            }
-
-            return totalSize;
-        }
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
-            if (richTextBox1.Text.Length > 0)
+            resetUI();
+            string curString = richTextBox1.Text;
+            string tempString = curString;
+
+            for (int i = 0; i < 3; i++)
             {
-                totalSizeLabel.Text = calcStringSize(richTextBox1.Text).ToString();
+                rows[i] = lineCalc.lineExtractor(tempString);
+
+                if(rows[i].Length > 0)
+                    tempString = tempString.Replace(rows[i], "");
+
+                if (tempString.Length == 0)
+                {
+                    i = 3;
+                }
             }
-            else
+
+            if (rows[0].Length > 0)
             {
-                totalSizeLabel.Text = "0";
+                firstSizeLabel.Text = lineCalc.calcStringSize(rows[0]).ToString();
             }
+
+            if (rows[1].Length > 0)
+            {
+                secondSizeLabel.Text = lineCalc.calcStringSize(rows[1]).ToString();
+            }
+
+            if (rows[2].Length > 0)
+            {
+                thirdSizeLabel.Text = lineCalc.calcStringSize(rows[2]).ToString();
+            }
+
+            if (lineCalc.lineExtractor(tempString).Length > 0)
+            {
+                errorLabel.Text = "Current line exceeds 3 rows by " +
+                    lineCalc.calcStringSize(tempString).ToString() +
+                    "pixels. Extra is: \n" + tempString;
+            }
+        }
+
+        private void resetUI()
+        {
+            firstSizeLabel.Text = "";
+            secondSizeLabel.Text = "";
+            thirdSizeLabel.Text = "";
+
+            errorLabel.Text = "Current line does not exceed 3 rows";
+
+        }
+
+        private void visualizeButton_Click(object sender, EventArgs e)
+        {
+            rows[0] = lineCalc.RemoveDiacritics(rows[0]);
+            rows[1] = lineCalc.RemoveDiacritics(rows[1]);
+            rows[2] = lineCalc.RemoveDiacritics(rows[2]);
+            Visualizer aVis = new Visualizer(rows[0], rows[1], rows[2]);
+            aVis.Show();
         }
     }
 }

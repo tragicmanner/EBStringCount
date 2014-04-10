@@ -33,12 +33,13 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
+            this.errorLabel = new System.Windows.Forms.Label();
             this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.totalSizeLabel = new System.Windows.Forms.Label();
             this.firstSizeLabel = new System.Windows.Forms.Label();
             this.secondSizeLabel = new System.Windows.Forms.Label();
             this.thirdSizeLabel = new System.Windows.Forms.Label();
+            this.visualizeButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label2
@@ -86,14 +87,14 @@
             this.label6.TabIndex = 5;
             this.label6.Text = "Third Line Size:";
             // 
-            // label7
+            // errorLabel
             // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(27, 239);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(176, 13);
-            this.label7.TabIndex = 6;
-            this.label7.Text = "Current line does not exceed 3 rows";
+            this.errorLabel.AutoSize = true;
+            this.errorLabel.Location = new System.Drawing.Point(27, 239);
+            this.errorLabel.Name = "errorLabel";
+            this.errorLabel.Size = new System.Drawing.Size(176, 13);
+            this.errorLabel.TabIndex = 6;
+            this.errorLabel.Text = "Current line does not exceed 3 rows";
             // 
             // richTextBox1
             // 
@@ -136,15 +137,26 @@
             this.thirdSizeLabel.Size = new System.Drawing.Size(0, 13);
             this.thirdSizeLabel.TabIndex = 11;
             // 
+            // visualizeButton
+            // 
+            this.visualizeButton.Location = new System.Drawing.Point(30, 207);
+            this.visualizeButton.Name = "visualizeButton";
+            this.visualizeButton.Size = new System.Drawing.Size(75, 23);
+            this.visualizeButton.TabIndex = 12;
+            this.visualizeButton.Text = "Visualize";
+            this.visualizeButton.UseVisualStyleBackColor = true;
+            this.visualizeButton.Click += new System.EventHandler(this.visualizeButton_Click);
+            // 
             // Form1
             // 
-            this.ClientSize = new System.Drawing.Size(284, 261);
+            this.ClientSize = new System.Drawing.Size(284, 299);
+            this.Controls.Add(this.visualizeButton);
             this.Controls.Add(this.thirdSizeLabel);
             this.Controls.Add(this.secondSizeLabel);
             this.Controls.Add(this.firstSizeLabel);
             this.Controls.Add(this.totalSizeLabel);
             this.Controls.Add(this.richTextBox1);
-            this.Controls.Add(this.label7);
+            this.Controls.Add(this.errorLabel);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
@@ -163,12 +175,13 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label errorLabel;
         private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.Label totalSizeLabel;
         private System.Windows.Forms.Label firstSizeLabel;
         private System.Windows.Forms.Label secondSizeLabel;
         private System.Windows.Forms.Label thirdSizeLabel;
+        private System.Windows.Forms.Button visualizeButton;
     }
 }
 
