@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -20,23 +21,31 @@ namespace EBLineParser
 
 
         //The maximum pixels a line can have in the text box.
-        private int lineSize { get; set; }
+        private int lineSize;
         //The File we are reading Characters and Widths from
-        private string inputFile { get; set; }
-
+        private string inputFile;
+        //A string that represents the path where your CCS project is kept
+        private string ccsPath;
+        
         //A list of all the Characters supported by the EBLINE class
         private char[] AllChars;
         //A list of all the widths, with the indexes corresponding with AllChars
         private int[] AllWidths;
         //A string that contains all the characters, with the same order as AllChars
         private string AllCharsString;
+        //A string that contains all the CCS data
+        private string[] ccsData;
 
         //The Maximum pixels you can have in a row
         private const int rowMax = 132;
+        //The Maximum pixels you can have in an item name
+        private const int itemMax = 71;
         //Forgot what this was for
         private const int dftLineSize = 30;
         //The default file that contains characters and their widths
         private const string dftFileName = "widths.cfg";
+        //A boolean that determines whether or not we are using a CCS project
+        private bool ccsUse = false;
 
         public ebline()
         {
@@ -65,6 +74,11 @@ namespace EBLineParser
         public int getRowMax()
         {
             return rowMax;
+        }
+
+        public int getItemMax()
+        {
+            return itemMax;
         }
 
         public int getDefaultLineSize()
@@ -135,8 +149,11 @@ namespace EBLineParser
 
             foreach (char c in aString)
             {
-                //The size of the character being used
-                totalSize += AllWidths[AllCharsString.IndexOf(c)];
+                if (AllCharsString.IndexOf(c) > -1)
+                {
+                    //The size of the character being used
+                    totalSize += AllWidths[AllCharsString.IndexOf(c)];
+                }
                 //The padding between characters
                 totalSize += 1;
             }
@@ -169,15 +186,18 @@ namespace EBLineParser
                 string aWord = "";
                 bool lineNotFound = true;
 
-                while (lineNotFound)
+                while (lineNotFound && !tempString.Equals(""))
                 {
                     aWord = nextWord(tempString);
-                    theLine = theLine + aWord;
-                    tempString = tempString.Replace(aWord, "");
-                    if (calcStringSize(theLine) > lineSize)
+                    tempString = tempString.Substring(aWord.Length);
+                    if (calcStringSize(theLine + aWord) > lineSize)
                     {
-                        theLine = theLine.Replace(aWord, "");
+
                         lineNotFound = false;
+                    }
+                    else
+                    {
+                        theLine = theLine + aWord;
                     }
 
                     if (aWord.Equals(tempString))
@@ -220,6 +240,64 @@ namespace EBLineParser
             }
 
             return stringBuilder.ToString().Normalize(NormalizationForm.FormC);
+        }
+
+        public string RemoveCCS(string text)
+        {
+            string aString = text;
+
+            string itemName = "Mr. Baseball cap";
+            string charName = "ABCDE";
+
+            Regex callEx = new Regex("call\\([A-Za-z]_0x[0-9A-Fa-f]{6}\\)");
+            Regex nameEx = new Regex("\\[1C 02 [0-9]{2}\\]");
+            Regex itemEx = new Regex("\\[1C 05 [0-9A-Fa-f]{2}\\]");
+
+            if (aString.Length - aString.Replace("\"", "").Length >= 2)
+            {
+                
+                aString = aString.Replace("\"", "");
+                aString = aString.Replace("  ", " ");
+
+                itemEx.Replace(aString, itemName);
+                nameEx.Replace(aString, charName);
+
+                if (callEx.IsMatch(aString))
+                {
+
+                }
+            }
+
+
+
+            return "";
+        }
+
+        public void enableCCS(string aPath)
+        {
+            ccsUse = true;
+
+            ccsPath = aPath;
+
+            loadCCS();
+        }
+
+        private void loadCCS()
+        {
+            int i = 0;
+
+            string[] dataFiles = Directory.GetFiles(ccsPath, "Data_*.ccs");
+
+            ccsData = new string[67];
+
+            foreach (string aFile in dataFiles)
+            {
+                StreamReader sr = new StreamReader(aFile);
+
+                ccsData[i] += sr.ReadToEnd();
+                
+                i++;
+            }
         }
     }
 }

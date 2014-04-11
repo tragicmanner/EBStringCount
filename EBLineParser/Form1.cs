@@ -56,8 +56,13 @@ namespace EBLineParser
             {
                 rows[i] = lineCalc.lineExtractor(tempString);
 
+                while (tempString.IndexOf(' ') == 0 | tempString.IndexOf('@') == 0)
+                {
+                    tempString = tempString.Substring(1);
+                }
+
                 if(rows[i].Length > 0)
-                    tempString = tempString.Replace(rows[i], "");
+                    tempString = tempString.Substring(rows[i].Length);
 
                 if (tempString.Length == 0)
                 {
