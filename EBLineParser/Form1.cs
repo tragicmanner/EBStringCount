@@ -45,71 +45,40 @@ namespace EBLineParser
             lineCalc.readWidths();
         }
 
-
-        private void richTextBox1_TextChanged(object sender, EventArgs e)
+        private void ccsPathButton_Click(object sender, EventArgs e)
         {
-            resetUI();
-            string curString = richTextBox1.Text;
-            string tempString = curString;
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
 
-            for (int i = 0; i < 3; i++)
+            DialogResult result = fbd.ShowDialog();
+
+            if (result == DialogResult.OK)
             {
-                rows[i] = lineCalc.lineExtractor(tempString);
-
-                while (tempString.IndexOf(' ') == 0 | tempString.IndexOf('@') == 0)
-                {
-                    tempString = tempString.Substring(1);
-                }
-
-                if(rows[i].Length > 0)
-                    tempString = tempString.Substring(rows[i].Length);
-
-                if (tempString.Length == 0)
-                {
-                    i = 3;
-                }
-            }
-
-            if (rows[0].Length > 0)
-            {
-                firstSizeLabel.Text = lineCalc.calcStringSize(rows[0]).ToString();
-            }
-
-            if (rows[1].Length > 0)
-            {
-                secondSizeLabel.Text = lineCalc.calcStringSize(rows[1]).ToString();
-            }
-
-            if (rows[2].Length > 0)
-            {
-                thirdSizeLabel.Text = lineCalc.calcStringSize(rows[2]).ToString();
-            }
-
-            if (lineCalc.lineExtractor(tempString).Length > 0)
-            {
-                errorLabel.Text = "Current line exceeds 3 rows by " +
-                    lineCalc.calcStringSize(tempString).ToString() +
-                    "pixels. Extra is: \n" + tempString;
+                ccsPathBox.Text = fbd.SelectedPath;
             }
         }
 
-        private void resetUI()
+        private void generateButton_Click(object sender, EventArgs e)
         {
-            firstSizeLabel.Text = "";
-            secondSizeLabel.Text = "";
-            thirdSizeLabel.Text = "";
-
-            errorLabel.Text = "Current line does not exceed 3 rows";
-
+            if (Directory.Exists(ccsPathBox.Text) &&
+                Directory.Exists(logPathBox.Text))
+            {
+                lineCalc.startCCS(ccsPathBox.Text,logPathBox.Text);
+                MessageBox.Show("Report has been completed", "Complete");
+            }
         }
 
-        private void visualizeButton_Click(object sender, EventArgs e)
+        private void logPathButton_Click(object sender, EventArgs e)
         {
-            rows[0] = lineCalc.RemoveDiacritics(rows[0]);
-            rows[1] = lineCalc.RemoveDiacritics(rows[1]);
-            rows[2] = lineCalc.RemoveDiacritics(rows[2]);
-            Visualizer aVis = new Visualizer(rows[0], rows[1], rows[2]);
-            aVis.Show();
+            FolderBrowserDialog fbd = new FolderBrowserDialog();
+
+            DialogResult result = fbd.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                logPathBox.Text = fbd.SelectedPath;
+            }
         }
+
+        
     }
 }

@@ -26,6 +26,8 @@ namespace EBLineParser
         private string inputFile;
         //A string that represents the path where your CCS project is kept
         private string ccsPath;
+        //A string that represents the path where your log will be generated
+        private string logPath;
         
         //A list of all the Characters supported by the EBLINE class
         private char[] AllChars;
@@ -33,8 +35,6 @@ namespace EBLineParser
         private int[] AllWidths;
         //A string that contains all the characters, with the same order as AllChars
         private string AllCharsString;
-        //A string that contains all the CCS data
-        private string[] ccsData;
 
         //The Maximum pixels you can have in a row
         private const int rowMax = 132;
@@ -44,8 +44,6 @@ namespace EBLineParser
         private const int dftLineSize = 30;
         //The default file that contains characters and their widths
         private const string dftFileName = "widths.cfg";
-        //A boolean that determines whether or not we are using a CCS project
-        private bool ccsUse = false;
 
         public ebline()
         {
@@ -248,6 +246,12 @@ namespace EBLineParser
 
             string itemName = "Mr. Baseball cap";
             string charName = "ABCDE";
+            string[] lineEnders = new string[4];
+
+            lineEnders[0] = "\" next";
+            lineEnders[1] = "\" eob";
+            lineEnders[2] = "\" end";
+            lineEnders[3] = "\" linebreak";
 
             Regex callEx = new Regex("call\\([A-Za-z]_0x[0-9A-Fa-f]{6}\\)");
             Regex nameEx = new Regex("\\[1C 02 [0-9]{2}\\]");
@@ -255,17 +259,27 @@ namespace EBLineParser
 
             if (aString.Length - aString.Replace("\"", "").Length >= 2)
             {
-                
+
+                foreach (string ender in lineEnders)
+                {
+                    aString = aString.Replace(ender, "");
+                }
+
                 aString = aString.Replace("\"", "");
                 aString = aString.Replace("  ", " ");
 
-                itemEx.Replace(aString, itemName);
-                nameEx.Replace(aString, charName);
+                aString = itemEx.Replace(aString, itemName);
+                aString = nameEx.Replace(aString, charName);
 
-                if (callEx.IsMatch(aString))
+                //Call replacement is going to be difficult because we need to
+                //reference lines in other files at times. For now, just leaving it
+                //for after I assess how much this can lengthen out a single line.
+                /*if (callEx.IsMatch(aString))
                 {
 
-                }
+                }*/
+
+                return aString;
             }
 
 
@@ -273,31 +287,94 @@ namespace EBLineParser
             return "";
         }
 
-        public void enableCCS(string aPath)
+        public void startCCS(string a_ccsPath, string a_logPath)
         {
-            ccsUse = true;
+            logPath = a_logPath;
+            ccsPath = a_ccsPath;
 
-            ccsPath = aPath;
-
-            loadCCS();
+            readCCS();
         }
 
-        private void loadCCS()
+        private void readCCS()
         {
-            int i = 0;
+            //Setup log file
+            string fileName = "cssOverflow_" + DateTime.Now.ToString("MMYYHHmmss") + ".log";
+            string fullFile = Path.Combine(logPath, fileName);
 
+            StreamWriter sw = new StreamWriter(@fullFile, false);
+            
+            //Setup reader
             string[] dataFiles = Directory.GetFiles(ccsPath, "Data_*.ccs");
+            string row1 = "";
+            string row2 = "";
+            string row3 = "";
 
-            ccsData = new string[67];
+            string[] rows = new string[3] {"","",""};
 
             foreach (string aFile in dataFiles)
             {
                 StreamReader sr = new StreamReader(aFile);
+                string curString = "";
+                int line = 0;
 
-                ccsData[i] += sr.ReadToEnd();
-                
-                i++;
+                while (!sr.EndOfStream)
+                {
+                    curString = sr.ReadLine();
+                    line++;
+                    string tempString = curString;
+
+                    tempString = RemoveCCS(tempString);
+
+                    tempString = RemoveDiacritics(tempString);
+
+                    for (int i = 0; i < 3; i++)
+                    {
+                        
+                        while (tempString.IndexOf(' ') == 0 | tempString.IndexOf('@') == 0)
+                        {
+                            tempString = tempString.Substring(1);
+                        }
+
+                        rows[i] = lineExtractor(tempString);
+
+                        if(rows[i].Length > 0)
+                            tempString = tempString.Substring(rows[i].Length);
+
+                        if (tempString.Length == 0)
+                        {
+                            i = 3;
+                        }
+                    }
+
+                    if (rows[0].Length > 0)
+                    {
+                        row1 = calcStringSize(rows[0]).ToString();
+                    }
+
+                    if (rows[1].Length > 0)
+                    {
+                        row2 = calcStringSize(rows[1]).ToString();
+                    }
+
+                    if (rows[2].Length > 0)
+                    {
+                        row3 = calcStringSize(rows[2]).ToString();
+                    }
+
+                    if (lineExtractor(tempString).Length > 0)
+                    {
+                        sw.WriteLine("=====================");
+                        sw.WriteLine("File: " + aFile);
+                        sw.WriteLine("Line: " + line);
+                        sw.WriteLine("Row 1: " + rows[0]);
+                        sw.WriteLine("Row 2: " + rows[1]);
+                        sw.WriteLine("Row 3: " + rows[2]);
+                        sw.WriteLine("Excess Text: " + tempString);
+                        sw.WriteLine("Excess Pixels: " + calcStringSize(tempString).ToString());
+                    }
+                }
             }
+            
         }
     }
 }
