@@ -43,6 +43,7 @@
             this.ccsPathBox.Name = "ccsPathBox";
             this.ccsPathBox.Size = new System.Drawing.Size(486, 20);
             this.ccsPathBox.TabIndex = 0;
+            this.ccsPathBox.TextChanged += new System.EventHandler(this.ccsPathBox_TextChanged);
             // 
             // ccsPathButton
             // 
@@ -60,6 +61,7 @@
             this.logPathBox.Name = "logPathBox";
             this.logPathBox.Size = new System.Drawing.Size(486, 20);
             this.logPathBox.TabIndex = 2;
+            this.logPathBox.TextChanged += new System.EventHandler(this.logPathBox_TextChanged);
             // 
             // logPathButton
             // 
@@ -86,9 +88,9 @@
             this.ccsPathLabel.AutoSize = true;
             this.ccsPathLabel.Location = new System.Drawing.Point(23, 32);
             this.ccsPathLabel.Name = "ccsPathLabel";
-            this.ccsPathLabel.Size = new System.Drawing.Size(104, 13);
+            this.ccsPathLabel.Size = new System.Drawing.Size(131, 13);
             this.ccsPathLabel.TabIndex = 5;
-            this.ccsPathLabel.Text = "Path to CCS Project:";
+            this.ccsPathLabel.Text = "Path to CoilSnake Project:";
             // 
             // logPathLabel
             // 

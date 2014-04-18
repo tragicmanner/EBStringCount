@@ -21,28 +21,12 @@ namespace EBLineParser
         {
             lineCalc = new ebline();
             InitializeComponent();
-            lineCalc.readWidths();
-        }
-
-        public Form1(string aFile)
-        {
-            lineCalc = new ebline(aFile);
-            InitializeComponent();
-            lineCalc.readWidths();
-        }
-
-        public Form1(string aFile, int aSize)
-        {
-            lineCalc = new ebline(aFile, aSize);
-            InitializeComponent();
-            lineCalc.readWidths();
         }
 
         public Form1(int aSize)
         {
             lineCalc = new ebline(aSize);
             InitializeComponent();
-            lineCalc.readWidths();
         }
 
         private void ccsPathButton_Click(object sender, EventArgs e)
@@ -62,6 +46,12 @@ namespace EBLineParser
             if (Directory.Exists(ccsPathBox.Text) &&
                 Directory.Exists(logPathBox.Text))
             {
+                string widthResult = lineCalc.readWidths();
+
+                if (!widthResult.Equals(""))
+                {
+                    MessageBox.Show(widthResult, "ERROR");
+                }
                 lineCalc.startCCS(ccsPathBox.Text,logPathBox.Text);
                 MessageBox.Show("Report has been completed", "Complete");
             }
@@ -77,6 +67,16 @@ namespace EBLineParser
             {
                 logPathBox.Text = fbd.SelectedPath;
             }
+        }
+
+        private void ccsPathBox_TextChanged(object sender, EventArgs e)
+        {
+            lineCalc.SetCoilPath(ccsPathBox.Text);
+        }
+
+        private void logPathBox_TextChanged(object sender, EventArgs e)
+        {
+            lineCalc.SetLogPath(logPathBox.Text);
         }
 
         
