@@ -39,6 +39,19 @@ namespace EBLineParser
             {
                 ccsPathBox.Text = fbd.SelectedPath;
             }
+
+            string widthResult = lineCalc.readWidths();
+
+            if (!widthResult.Equals(""))
+            {
+                MessageBox.Show(widthResult, "ERROR");
+                ccsPathBox.Text = "";
+            }
+            else
+            {
+                testFontsBut.Enabled = true;
+            }
+
         }
 
         private void generateButton_Click(object sender, EventArgs e)
@@ -79,6 +92,23 @@ namespace EBLineParser
             lineCalc.SetLogPath(logPathBox.Text);
         }
 
-        
+        private void ccsPathBox_Leave(object sender, EventArgs e)
+        {
+            if(Directory.Exists(Path.Combine(ccsPathBox.Text,"Fonts")))
+            {
+
+                string widthResult = lineCalc.readWidths();
+
+                if (!widthResult.Equals(""))
+                {
+                    MessageBox.Show(widthResult, "ERROR");
+                    ccsPathBox.Text = "";
+                }
+                else
+                {
+                    testFontsBut.Enabled = true;
+                }
+            }
+        }
     }
 }

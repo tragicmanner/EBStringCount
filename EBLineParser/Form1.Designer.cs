@@ -35,6 +35,7 @@
             this.generateButton = new System.Windows.Forms.Button();
             this.ccsPathLabel = new System.Windows.Forms.Label();
             this.logPathLabel = new System.Windows.Forms.Label();
+            this.testFontsBut = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // ccsPathBox
@@ -44,6 +45,7 @@
             this.ccsPathBox.Size = new System.Drawing.Size(486, 20);
             this.ccsPathBox.TabIndex = 0;
             this.ccsPathBox.TextChanged += new System.EventHandler(this.ccsPathBox_TextChanged);
+            this.ccsPathBox.Leave += new System.EventHandler(this.ccsPathBox_Leave);
             // 
             // ccsPathButton
             // 
@@ -101,9 +103,20 @@
             this.logPathLabel.TabIndex = 6;
             this.logPathLabel.Text = "Location to save LogFile to:";
             // 
+            // testFontsBut
+            // 
+            this.testFontsBut.Enabled = false;
+            this.testFontsBut.Location = new System.Drawing.Point(26, 141);
+            this.testFontsBut.Name = "testFontsBut";
+            this.testFontsBut.Size = new System.Drawing.Size(75, 23);
+            this.testFontsBut.TabIndex = 7;
+            this.testFontsBut.Text = "Test Fonts";
+            this.testFontsBut.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(580, 176);
+            this.Controls.Add(this.testFontsBut);
             this.Controls.Add(this.logPathLabel);
             this.Controls.Add(this.ccsPathLabel);
             this.Controls.Add(this.generateButton);
@@ -126,6 +139,7 @@
         private System.Windows.Forms.Button generateButton;
         private System.Windows.Forms.Label ccsPathLabel;
         private System.Windows.Forms.Label logPathLabel;
+        private System.Windows.Forms.Button testFontsBut;
 
     }
 }

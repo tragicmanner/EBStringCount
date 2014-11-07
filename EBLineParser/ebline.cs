@@ -42,9 +42,7 @@ namespace EBLineParser
         //A list of all the Characters supported by the EBLINE class
         private char[] AllChars;
         //A list of all the widths, with the indexes corresponding with AllChars
-        private int[] AllWidths;
-        //A list of all the Saturn widths
-        private int[] AllWidthsSaturn;
+        private List<List<int>> AllWidths;
 
         //A string that contains all the characters, with the same order as AllChars
         private const string AllCharsString =  "!\"#$%&\\()*+,-./0123456789:;<=>?" + 
@@ -89,76 +87,44 @@ namespace EBLineParser
         //Reads all the characters and widths from the widths file
         public string readWidths()
         {
-            AllWidths = new int[96];
-            AllWidthsSaturn = new int[96];
+            string[] widthFiles = Directory.GetFiles(Path.Combine(coilPath, "Fonts"), "*.yml");
+            AllWidths = new List<List<int>>();
             AllChars = new char[96];
             string line = "";
             string subLine = "";
             string subLine2 = "";
-            int counter = 0;
-            string aFile;
 
             AllChars = AllCharsString.ToCharArray();
 
-            aFile = Path.Combine(coilPath, "Fonts\\0_widths.yml");
-
-            try
+            foreach (string aFile in widthFiles)
             {
-                using (StreamReader sr = new StreamReader(aFile))
+                try
                 {
-                    while ((line = sr.ReadLine()) != null)
+                    List<int> tempList = new List<int>();
+                    using (StreamReader sr = new StreamReader(aFile))
                     {
-                        //AllChars[counter] = line[0];
-                        if (line.Contains("::"))
+                        while ((line = sr.ReadLine()) != null)
                         {
-                            subLine2 = line.Substring(line.IndexOf(':') + 1, line.Length - (line.IndexOf(':') + 1));
-                            subLine = subLine2.Substring(subLine2.IndexOf(':') + 1, subLine2.Length - (subLine2.IndexOf(':') + 1));
+                            if (line.Contains("::"))
+                            {
+                                subLine2 = line.Substring(line.IndexOf(':') + 1, line.Length - (line.IndexOf(':') + 1));
+                                subLine = subLine2.Substring(subLine2.IndexOf(':') + 1, subLine2.Length - (subLine2.IndexOf(':') + 1));
+                            }
+                            else
+                            {
+                                subLine = line.Substring(line.IndexOf(':') + 1, line.Length - (line.IndexOf(':') + 1));
+                            }
+                            subLine = subLine.Trim();
+                            tempList.Add(Convert.ToInt32(subLine));
                         }
-                        else
-                        {
-                            subLine = line.Substring(line.IndexOf(':') + 1, line.Length - (line.IndexOf(':') + 1));
-                        }
-                        subLine = subLine.Trim();
-                        AllWidths[counter] = Convert.ToInt32(subLine);
-                        counter++;
+                        sr.Close();
                     }
-                    sr.Close();
+                    AllWidths.Add(tempList);
                 }
-            }
-            catch (Exception e)
-            {
-                return "" + e.Message + ": The file " + aFile + " could not be read:";
-            }
-
-            aFile = Path.Combine(coilPath, "Fonts\\1_widths.yml");
-            counter = 0;
-
-            try
-            {
-                using (StreamReader sr = new StreamReader(aFile))
+                catch (Exception e)
                 {
-                    while ((line = sr.ReadLine()) != null)
-                    {
-                        //AllChars[counter] = line[0];
-                        if (line.Contains("::"))
-                        {
-                            subLine2 = line.Substring(line.IndexOf(':') + 1, line.Length - (line.IndexOf(':') + 1));
-                            subLine = subLine2.Substring(subLine2.IndexOf(':') + 1, subLine2.Length - (subLine2.IndexOf(':') + 1));
-                        }
-                        else
-                        {
-                            subLine = line.Substring(line.IndexOf(':') + 1, line.Length - (line.IndexOf(':') + 1));
-                        }
-                        subLine = subLine.Trim();
-                        AllWidthsSaturn[counter] = Convert.ToInt32(subLine);
-                        counter++;
-                    }
-                    sr.Close();
+                    return "" + e.Message + ": The file " + aFile + " could not be read:";
                 }
-            }
-            catch (Exception e)
-            {
-                return "" + e.Message + ": The file " + aFile + " could not be read:";
             }
 
             return "";
@@ -177,7 +143,7 @@ namespace EBLineParser
                 if (AllCharsString.IndexOf(c) > -1)
                 {
                     //The size of the character being used
-                    totalSize += AllWidths[AllCharsString.IndexOf(c)];
+                    totalSize += AllWidths[0][AllCharsString.IndexOf(c)];
                 }
                 //The padding between characters
                 totalSize += 1;
