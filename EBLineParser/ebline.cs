@@ -225,6 +225,17 @@ namespace EBLineParser
             var normalizedString = text.Normalize(NormalizationForm.FormD);
             var stringBuilder = new StringBuilder();
 
+            Regex charCode = new Regex("\\[[aA5-9][a-fA-F0-9]\\]");
+
+            // Replace character codes
+            foreach (Match match in charCode.Matches(normalizedString))
+            {
+                if (match.Success)
+                {
+                    normalizedString = normalizedString.Replace(match.Value, AllCharsString[AllCharsString.IndexOf(AllChars.Max())].ToString());
+                }
+            }
+
             foreach (var c in normalizedString)
             {
                 var unicodeCategory = CharUnicodeInfo.GetUnicodeCategory(c);
@@ -421,11 +432,11 @@ namespace EBLineParser
                     {
                         string tempString = curString;
 
-                        // Get rid of any extra codes at this point
-                        tempString = RemoveCCS(tempString);
-
                         // Get rid of accented characters
                         tempString = RemoveDiacritics(tempString);
+
+                        // Get rid of any extra codes at this point
+                        tempString = RemoveCCS(tempString);
 
                         for (int i = 0; i < 3; i++)
                         {
@@ -587,24 +598,6 @@ namespace EBLineParser
             }
 
             return "AAAAAAAAAAAAAAAAAAAAAAAAA";
-        }
-
-        private string loadCCScript(string aCode)
-        {
-            if(aCode.Contains("name("))
-            {
-                //TODO Handle naming_skip.yml
-                //StreamReader skipReader = new StreamReader(Path.Combine(coilPath,"\\naming_skip.yml"));
-                string wideName = String.Format("{0}{0}{0}{0}{0}",AllCharsString[AllCharsString.IndexOf(AllChars.Max())]);
-                return wideName;    
-            }
-
-            if(aCode.Contains("itemname("))
-            {
-
-            }
-
-            return "";
         }
 
         private void calculateWindowSize()
