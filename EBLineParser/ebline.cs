@@ -319,7 +319,6 @@ namespace EBLineParser
                     }
                 }
 
-
                 return aString;
             }
             return "";
@@ -332,9 +331,7 @@ namespace EBLineParser
             //Regex patterns to completely remove
             Regex controlCode = new Regex("(\\[[0-9A-Fa-f]{2}( [0-9A-Fa-f]{2})* |goto|call)" +
                 "((\\{e)*\\(.*\\)(\\})*)+(\\])*");
-            Regex CCScript = new Regex("[a-z_]+\\([a-z_0-9.]+\\)");
-            Regex CCScriptInline = new Regex("{[a-z_\\(\\)0-9 ]+}");
-            Regex name = new Regex("name\\([0-9]+\\)");
+            Regex name = new Regex("name\\([0-9]+?\\)");
             Regex nameCC = new Regex("\\[1C 02 [0-9ABCDEF]{2}\\]");
             Regex item = new Regex("itemname\\([0-9]+\\)");
             Regex itemCC = new Regex("\\[1C 05 [0-9ABCDEF]{2}\\]");
@@ -381,24 +378,6 @@ namespace EBLineParser
                 if (match.Success)
                 {
                     aString = aString.Replace(match.Value, String.Format("{0}{0}{0}{0}{0}", AllCharsString[AllCharsString.IndexOf(AllChars.Max())]));
-                }
-            }
-
-            //Handle Inline CCScript
-            foreach (Match match in CCScriptInline.Matches(aString))
-            {
-                if (match.Success)
-                {
-                    aString = aString.Replace(match.Value, loadCCScript(match.Value));
-                }
-            }
-
-            //Handle other CCScript
-            foreach (Match match in CCScript.Matches(aString))
-            {
-                if (match.Success)
-                {
-                    aString = aString.Replace(match.Value, loadCCScript(match.Value));
                 }
             }
 
