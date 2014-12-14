@@ -44,6 +44,9 @@ namespace EBLineParser
         //A list of all the widths, with the indexes corresponding with AllChars
         private List<List<int>> AllWidths;
 
+        // The place we will keep all the ccs files
+        Dictionary<string, Dictionary<string, string>> CCSFiles;
+
         //A string that contains all the characters, with the same order as AllChars
         private const string AllCharsString =  "!\"#$%&\\()*+,-./0123456789:;<=>?" + 
             "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~¬";
@@ -76,7 +79,8 @@ namespace EBLineParser
 
         public void SetCoilPath(string aPath)
         {
-            coilPath = aPath;
+            if (!aPath.Equals(string.Empty))
+                coilPath = aPath;
         }
 
         public void SetLogPath(string aPath)
@@ -238,19 +242,20 @@ namespace EBLineParser
             string aString = text;
 
             string[] lineEnders = new string[4];
-            Regex controlCode = new Regex("\\[[0-9A-Fa-f]{2}( [0-9A-Fa-f]{2})*" +
-                "( \\{e\\((data_[0-9]{2}.)*l_0x[0-9A-Fa-f]{6}\\)\\})*\\]");
-            Regex CCScript = new Regex("[a-z_]+\\([a-z_0-9.]+\\)");
-            Regex CCScriptInline = new Regex("{[a-z_\\(\\)0-9 ]+}");
-
-
             //Setup line enders to be removed in string length assessment
             lineEnders[0] = "\" next";
             lineEnders[1] = "\" eob";
             lineEnders[2] = "\" end";
             lineEnders[3] = "\" linebreak";
 
-            if (aString.Length - aString.Replace("\"", "").Length >= 2)
+            //Regex patterns to completely remove
+            Regex controlCode = new Regex("(\\[[0-9A-Fa-f]{2}( [0-9A-Fa-f]{2})* |goto|call)" +
+                "((\\{e)*\\(.*\\)(\\})*)+(\\])*");
+            Regex CCScript = new Regex("[a-z_]+\\([a-z_0-9.]+\\)");
+            Regex CCScriptInline = new Regex("{[a-z_\\(\\)0-9 ]+}");
+            Regex extraCode = new Regex("\\[([0-9A-F]{2}[ ]*)+\\]");
+
+            if (aString.Replace("\"", "").Length >= 2)
             {
 
                 foreach (string ender in lineEnders)
@@ -261,12 +266,133 @@ namespace EBLineParser
                 aString = aString.Replace("\"", "");
                 aString = aString.Replace("  ", " ");
 
-                //Handle Control Codes
+                // Replace control codes
                 foreach (Match match in controlCode.Matches(aString))
                 {
                     if (match.Success)
                     {
-                        aString = aString.Replace(match.Value, loadControlCode(match.Value));
+                        aString = aString.Replace(match.Value, "");
+                    }
+                }
+
+                //Handle Inline CCScript
+                foreach (Match match in CCScriptInline.Matches(aString))
+                {
+                    if (match.Success)
+                    {
+                        aString = aString.Replace(match.Value, "");
+                    }
+                }
+
+                //Handle other CCScript
+                foreach (Match match in CCScript.Matches(aString))
+                {
+                    if (match.Success)
+                    {
+                        aString = aString.Replace(match.Value, "");
+                    }
+                }
+
+                
+                // Get rid of any left over CC stuff
+                foreach (Match match in extraCode.Matches(aString))
+                {
+                    if (match.Success)
+                    {
+                        aString = aString.Replace(match.Value, "");
+                    }
+                }
+
+
+                return aString;
+            }
+            return "";
+        }
+
+        public string ReplaceCCS(string file, string text, int runs)
+        {
+            string aString = text;
+
+            string[] lineEnders = new string[10];
+            //Setup line/block enders to be removed in string length assessment
+            lineEnders[0] = "\" next";
+            lineEnders[1] = "\" eob";
+            lineEnders[2] = "\" end";
+            lineEnders[3] = "\" linebreak";
+            lineEnders[4] = "\" newline";
+            lineEnders[5] = "  next";
+            lineEnders[6] = "  eob";
+            lineEnders[7] = "  end";
+            lineEnders[8] = "  linebreak";
+            lineEnders[9] = "  newline";
+
+            //Regex patterns to completely remove
+            Regex controlCode = new Regex("(\\[[0-9A-Fa-f]{2}( [0-9A-Fa-f]{2})* |goto|call)" +
+                "((\\{e)*\\(.*\\)(\\})*)+(\\])*");
+            Regex CCScript = new Regex("[a-z_]+\\([a-z_0-9.]+\\)");
+            Regex CCScriptInline = new Regex("{[a-z_\\(\\)0-9 ]+}");
+            Regex name = new Regex("name\\([0-9]+\\)");
+            Regex nameCC = new Regex("\\[1C 02 [0-9ABCDEF]{2}\\]");
+            Regex item = new Regex("itemname\\([0-9]+\\)");
+            Regex itemCC = new Regex("\\[1C 05 [0-9ABCDEF]{2}\\]");
+
+            if (aString.Length - aString.Replace("\"", "").Length >= 2)
+            {
+
+                foreach (string ender in lineEnders)
+                {
+                    aString = aString.Replace(ender, "");
+                }
+
+                aString = aString.Replace("  \"", "");
+                aString = aString.Replace("\"", "");
+                aString = aString.Replace("  ", " ");
+
+                //remove whitespace
+
+                // Replace control codes
+                foreach (Match match in controlCode.Matches(aString))
+                {
+                    if (match.Success)
+                    {
+                        aString = aString.Replace(match.Value, loadControlCode(file, match.Value, runs));
+                    }
+                }
+
+                // Replace item stuff
+                foreach (Match match in item.Matches(aString))
+                {
+                    if (match.Success)
+                    {
+                        int number = Convert.ToInt32(match.Value.Substring(match.Value.IndexOf("itemname(") + 
+                            9, match.Value.IndexOf(')') - match.Value.IndexOf("itemname(")));
+                        aString = aString.Replace(match.Value, loadItem(number));
+                    }
+                }
+
+                foreach (Match match in itemCC.Matches(aString))
+                {
+                    if (match.Success)
+                    {
+                        int number = Convert.ToInt32(match.Value.Substring(match.Value.IndexOf("1C 05") + 6, 2), 16);
+                        aString = aString.Replace(match.Value, loadItem(number));
+                    }
+                }
+
+                // Replace Name stuff
+                foreach (Match match in name.Matches(aString))
+                {
+                    if (match.Success)
+                    {
+                        aString = aString.Replace(match.Value, String.Format("{0}{0}{0}{0}{0}", AllCharsString[AllCharsString.IndexOf(AllChars.Max())]));
+                    }
+                }
+
+                foreach (Match match in nameCC.Matches(aString))
+                {
+                    if (match.Success)
+                    {
+                        aString = aString.Replace(match.Value, String.Format("{0}{0}{0}{0}{0}", AllCharsString[AllCharsString.IndexOf(AllChars.Max())]));
                     }
                 }
 
@@ -290,9 +416,7 @@ namespace EBLineParser
 
                 return aString;
             }
-
-
-
+            
             return "";
         }
 
@@ -311,85 +435,194 @@ namespace EBLineParser
             //Setup log file
             string fileName = "cssOverflow_" + DateTime.Now.ToString("MMyyHHmmss") + ".log";
             string fullFile = Path.Combine(logPath, fileName);
+            string[] delimiters = new string[] { Environment.NewLine, "{wait}", "{prompt}", "{next}" };
+            CCSFiles = loadCCScriptFiles();
 
             StreamWriter sw = new StreamWriter(@fullFile, false);
-            
-            //Setup reader
-            //TODO Setup Bad Path handling here
-            string[] dataFiles = Directory.GetFiles(coilPath, "ccscript\\Data_*.ccs");
 
             string[] rows = new string[numRows];
 
-            foreach (string aFile in dataFiles)
+            foreach (KeyValuePair <string, Dictionary<string, string>> kvp in CCSFiles)
             {
-                StreamReader sr = new StreamReader(aFile);
-                string curString = "";
-                int line = 0;
-
-                while (!sr.EndOfStream)
+                foreach (KeyValuePair <string, string> svp in kvp.Value)
                 {
-                    curString = sr.ReadLine();
-                    line++;
-                    string tempString = curString;
+                    
 
-                    tempString = RemoveCCS(tempString);
+                    string[] lines = svp.Value.Split(delimiters, StringSplitOptions.None);
 
-                    tempString = RemoveDiacritics(tempString);
-
-                    for (int i = 0; i < 3; i++)
+                    foreach (string curString in lines)
                     {
-                        
-                        while (tempString.IndexOf(' ') == 0 | tempString.IndexOf('@') == 0)
+                        string tempString = curString;
+
+                        tempString = ReplaceCCS(kvp.Key, tempString, 0);
+
+                        // Get rid of any extra codes at this point
+                        tempString = RemoveCCS(tempString);
+
+                        // Get rid of accented characters
+                        tempString = RemoveDiacritics(tempString);
+
+                        for (int i = 0; i < 3; i++)
                         {
-                            tempString = tempString.Substring(1);
+
+                            while (tempString.IndexOf(' ') == 0 | tempString.IndexOf('@') == 0)
+                            {
+                                tempString = tempString.Substring(1);
+                            }
+
+                            rows[i] = lineExtractor(tempString);
+
+                            if (rows[i].Length > 0)
+                                tempString = tempString.Substring(rows[i].Length);
+
+                            if (tempString.Length == 0)
+                            {
+                                i = 3;
+                            }
                         }
 
-                        rows[i] = lineExtractor(tempString);
-
-                        if(rows[i].Length > 0)
-                            tempString = tempString.Substring(rows[i].Length);
-
-                        if (tempString.Length == 0)
+                        if (lineExtractor(tempString).Length > 0)
                         {
-                            i = 3;
+                            sw.WriteLine("=====================");
+                            sw.WriteLine("File: " + kvp.Key);
+                            sw.WriteLine("Label: " + svp.Key);
+                            for (int p = 0; p < numRows; p++)
+                            {
+                                sw.WriteLine("Row {0}: {1}", p, rows[p]);
+                            }
+                            sw.WriteLine("Excess Text: " + tempString);
+                            sw.WriteLine("Excess Pixels: " + calcStringSize(tempString).ToString());
                         }
-                    }
 
-                    if (lineExtractor(tempString).Length > 0)
-                    {
-                        sw.WriteLine("=====================");
-                        sw.WriteLine("File: " + aFile);
-                        sw.WriteLine("Line: " + line);
-                        for (int p = 0; p < numRows; p++)
-                        {
-                            sw.WriteLine("Row {0}: {1}", p, rows[p]);
-                        }
-                        sw.WriteLine("Excess Text: " + tempString);
-                        sw.WriteLine("Excess Pixels: " + calcStringSize(tempString).ToString());
                     }
                 }
             }
             sw.Close();
         }
 
-        private string loadControlCode(string aCode)
+        private string loadControlCode(string file, string aCode, int runs)
         {
-            Regex[] loadThese = new Regex[10];
+            Match aMatch;
+            Match aLabel;
 
-            //Setup regular expressions that need to be replaced w/ strings from another location
-            loadThese[0] = new Regex("call\\([A-Za-z]_0x[0-9A-Fa-f]{6}\\)");
-            loadThese[1] = new Regex("\\[1C 02 [0-9]{2}\\]");
-            loadThese[2] = new Regex("\\[1C 05 [0-9A-Fa-f]{2}\\]");
-            //TODO [06 ...]
-            //TODO [08 ...]
-            //TODO [09 ...]
-            //TODO [0A ...]
+            string newFile = "";
+            string label = "";
 
-            
+            Regex[] replaces = new Regex[3];
+            //Regex patterns to be replaced with text from somewhere else:
+            replaces[0] = new Regex("call\\(.*\\)");
+            replaces[1] = new Regex("goto\\(.*\\)");
+            replaces[2] = new Regex("\\[09.*\\]");
+
+            //Regex pattern to use to pull out label references
+            Regex labelRef = new Regex("\\([^\\)]*\\)");
+
+            foreach (Regex aReg in replaces)
+            {
+                newFile = "";
+                aMatch = aReg.Match(aCode);
+
+                if (aMatch.Success)
+                {
+                    aLabel = labelRef.Match(aCode);
+
+                    if (aLabel.Success)
+                    {
+                        if (aLabel.Value.Contains('.'))
+                        {
+                            string[] split = aLabel.Value.Split('.');
+                            newFile = split[0].Replace("(", "");
+                            label = split[1].Replace("(", "").Replace(")", "");
+                        }
+                        else
+                        {
+                            newFile = file;
+                            label = aLabel.Value.Replace("(", "").Replace(")", "");
+                        }
+
+                        if (runs < 10)
+                            return ReplaceCCS(newFile, CCSFiles[newFile][label], ++runs);
+                        else
+                            return RemoveCCS(CCSFiles[newFile][label]);
+                    }
+                }
+            }
 
             //If the code doesn't match any of the above, pass an empty string which will be used
             //to likely remove the code from the string to be assessed.
             return "";
+        }
+
+        private Dictionary<string, Dictionary<string, string>> loadCCScriptFiles()
+        {
+            //Setup reader
+            //TODO Setup Bad Path handling here
+            var CCSFiles = new Dictionary<string, Dictionary<string, string>>();
+            string[] dataFiles = Directory.GetFiles(coilPath, "ccscript\\*.ccs");
+            string aLabel = "";
+            Regex label = new Regex("^[a-zA-Z]+[_a-zA-Z0-9]*:");
+
+            foreach (string aFile in dataFiles)
+            {
+                StreamReader sr = new StreamReader(aFile);
+                string curString = "";
+
+                string fileName = Path.GetFileNameWithoutExtension(aFile);
+
+                CCSFiles.Add(fileName, new Dictionary<string,string>());
+
+                curString = sr.ReadLine();
+
+                while (!sr.EndOfStream)
+                {
+                    if (label.Match(curString).Success)
+                    {
+                        aLabel = curString.Replace(":", "");
+                        curString = sr.ReadLine();
+                        string content = "";
+
+                        while (!label.Match(curString).Success & !sr.EndOfStream)
+                        {
+                            content += curString + Environment.NewLine;
+                            curString = sr.ReadLine();
+                        }
+                        CCSFiles[fileName].Add(aLabel, content);
+                    }
+                    else
+                    {
+                        curString = sr.ReadLine();
+                    }
+                }
+            }
+
+            return CCSFiles;
+        }
+
+        private string loadItem(int aNum)
+        {
+            string aPath = Path.Combine(coilPath, "item_configuration_table.yml");
+            string curLine = "";
+            string name = "Name:";
+            StreamReader itemStream = new StreamReader(aPath);
+
+            while (!itemStream.EndOfStream)
+            {
+                curLine = itemStream.ReadLine();
+
+                if(curLine.Equals(aNum + ":"))
+                {
+                    while (!itemStream.EndOfStream)
+                    {
+                        curLine = itemStream.ReadLine();
+                        if(curLine.Contains(name))
+                        {
+                            return curLine.Substring(curLine.IndexOf(name) + name.Length);
+                        }
+                    }
+                }
+            }
+
+            return "AAAAAAAAAAAAAAAAAAAAAAAAA";
         }
 
         private string loadCCScript(string aCode)
