@@ -48,7 +48,7 @@ namespace EBLineParser
         Dictionary<string, Dictionary<string, string>> CCSFiles;
 
         //A string that contains all the characters, with the same order as AllChars
-        private const string AllCharsString =  "!\"#$%&\\()*+,-./0123456789:;<=>?" + 
+        private const string AllCharsString =  " !\"#$%&\\()*+,-./0123456789:;<=>?" + 
             "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~¬";
         //The Default pixels you can have in a row
         private const int rowDefault = 132;
