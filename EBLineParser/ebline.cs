@@ -164,13 +164,13 @@ namespace EBLineParser
                 aString = aString.Substring(1);
             }
 
-            if (calcStringSize(aString) > lineSize &&
+            if (calcStringSize(aString) >= lineSize &&
                 !aString.Contains(' '))
             {
                 return "ERROR_LINE_OVERFLOW";
             }
 
-            if (calcStringSize(aString) <= lineSize)
+            if (calcStringSize(aString) < lineSize)
             {
                 return aString;
             }
@@ -185,7 +185,7 @@ namespace EBLineParser
                 {
                     aWord = nextWord(tempString);
                     tempString = tempString.Substring(aWord.Length);
-                    if (calcStringSize(theLine + aWord) > lineSize)
+                    if (calcStringSize(theLine + aWord) >= lineSize)
                     {
 
                         lineNotFound = false;
