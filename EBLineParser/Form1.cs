@@ -38,18 +38,16 @@ namespace EBLineParser
             if (result == DialogResult.OK)
             {
                 ccsPathBox.Text = fbd.SelectedPath;
-            }
-
-            string widthResult = lineCalc.readWidths();
-
-            if (!widthResult.Equals(""))
-            {
-                MessageBox.Show(widthResult, "ERROR");
-                ccsPathBox.Text = "";
-            }
-            else
-            {
-                testFontsBut.Enabled = true;
+                string widthResult = lineCalc.readWidths();
+                if (!widthResult.Equals(""))
+                {
+                    MessageBox.Show(widthResult, "ERROR");
+                    ccsPathBox.Text = "";
+                }
+                else
+                {
+                    testFontsBut.Enabled = true;
+                }
             }
 
         }
@@ -109,6 +107,12 @@ namespace EBLineParser
                     testFontsBut.Enabled = true;
                 }
             }
+        }
+
+        private void testFontsBut_Click(object sender, EventArgs e)
+        {
+            VisualInterface vis = new VisualInterface(lineCalc);
+            vis.Show();
         }
     }
 }

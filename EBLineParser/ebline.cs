@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace EBLineParser
 {
-    class ebline
+    public class ebline
     {
         /*//////////////////////////////////////////////////////////////////////////////
          * ERROR CODES
@@ -26,8 +27,6 @@ namespace EBLineParser
         private string coilPath;
         //A string that represents the path where your log will be generated
         private string logPath;
-        //A boolean to determine whether we are using Saturn font or not
-        private bool isSaturn;
         //The tile height of our text window
         private int windowHeight;
         //The tile width of our text window
@@ -38,6 +37,8 @@ namespace EBLineParser
         private int windowYOffset;
         //The number of rows that fit in a window
         private int numRows;
+        //The font number currently in use
+        private int fontNum = 0;
         
         //A list of all the Characters supported by the EBLINE class
         private char[] AllChars;
@@ -72,15 +73,31 @@ namespace EBLineParser
             lineSize = aSize;
         }
 
+        public string getCoilPath()
+        {
+            return coilPath;
+        }
+
+        public int getNumFonts()
+        {
+            return AllWidths.Count;
+        }
+
         public int getRowMax()
         {
-            return rowDefault;
+            return numRows;
         }
 
         public void SetCoilPath(string aPath)
         {
             if (!aPath.Equals(string.Empty))
                 coilPath = aPath;
+        }
+
+        public void SetCurrentFont(int aFont)
+        {
+            fontNum = aFont;
+            calculateWindowSize(fontNum);
         }
 
         public void SetLogPath(string aPath)
@@ -147,7 +164,7 @@ namespace EBLineParser
                 if (AllCharsString.IndexOf(c) > -1)
                 {
                     //The size of the character being used
-                    totalSize += AllWidths[0][AllCharsString.IndexOf(c)];
+                    totalSize += AllWidths[fontNum][AllCharsString.IndexOf(c)];
                 }
                 //The padding between characters
                 totalSize += 1;
@@ -159,11 +176,6 @@ namespace EBLineParser
         //Returns the first string that cleanly fits on one line
         public string lineExtractor(string aString)
         {
-            if (aString.IndexOf(' ') == 0 | aString.IndexOf('@') == 0)
-            {
-                aString = aString.Substring(1);
-            }
-
             if (calcStringSize(aString) >= lineSize &&
                 !aString.Contains(' '))
             {
@@ -218,6 +230,34 @@ namespace EBLineParser
             wordBoundary = aString.Substring(1).IndexOf(' ') + 1;
             nextWord = aString.Substring(0, wordBoundary);
             return nextWord;
+        }
+
+        public ArrayList ParseString(string text)
+        {
+            string tempString = text;
+            ArrayList rows = new ArrayList();
+
+            // Get rid of accented characters
+            tempString = RemoveDiacritics(tempString);
+
+            // Get rid of any extra codes at this point
+            tempString = RemoveCCS(tempString);
+
+            for (int i = 0; i < numRows; i++)
+            {
+                rows.Add(lineExtractor(tempString));
+
+                if (rows[i].ToString().Length > 0)
+                    tempString = tempString.Substring(rows[i].ToString().Length);
+
+                if (tempString.Length == 0)
+                {
+                    i = numRows;
+                }
+            }
+            if (tempString.Length != 0)
+                rows.Add(tempString);
+            return rows;
         }
 
         public string RemoveDiacritics(string text)
@@ -400,7 +440,7 @@ namespace EBLineParser
             logPath = a_logPath;
             coilPath = Path.Combine(a_ccsPath);
 
-            calculateWindowSize();
+            calculateWindowSize(1);
 
             readCCS();
         }
@@ -432,20 +472,19 @@ namespace EBLineParser
                     {
                         string tempString = curString;
 
+                        // Get rid of leading spaces from line indentation
+                        while (tempString.IndexOf(' ') == 0)
+                        {
+                            tempString = tempString.Substring(1);
+                        }
                         // Get rid of accented characters
                         tempString = RemoveDiacritics(tempString);
 
                         // Get rid of any extra codes at this point
                         tempString = RemoveCCS(tempString);
 
-                        for (int i = 0; i < 3; i++)
+                        for (int i = 0; i < numRows; i++)
                         {
-
-                            while (tempString.IndexOf(' ') == 0 | tempString.IndexOf('@') == 0)
-                            {
-                                tempString = tempString.Substring(1);
-                            }
-
                             rows[i] = lineExtractor(tempString);
 
                             if (rows[i].Length > 0)
@@ -453,7 +492,7 @@ namespace EBLineParser
 
                             if (tempString.Length == 0)
                             {
-                                i = 3;
+                                i = numRows;
                             }
                         }
 
@@ -600,7 +639,7 @@ namespace EBLineParser
             return "AAAAAAAAAAAAAAAAAAAAAAAAA";
         }
 
-        private void calculateWindowSize()
+        private void calculateWindowSize(int window)
         {
             string aPath = Path.Combine(coilPath, "window_configuration_table.yml");
             Regex aNum = new Regex("[0-9]+");
@@ -613,7 +652,7 @@ namespace EBLineParser
             {
                 curLine = windowStream.ReadLine();
 
-                if (curLine.Equals("1:"))
+                if (curLine.Equals(window.ToString() + ":"))
                 {
                     windowHeight = Convert.ToInt32(aNum.Match(windowStream.ReadLine()).Value);
 
@@ -625,8 +664,8 @@ namespace EBLineParser
 
                     windowStream.Close();
 
-                    //20 is the number of pixels lost to indentation and window borders
-                    lineSize = ( windowWidth * tilePixels) - 20;
+                    //22 is the number of pixels lost to indentation and window borders
+                    lineSize = ( windowWidth * tilePixels) - 22;
 
                     //13 is the number of pixels lost to indentation and window borders
                     numRows = (( windowHeight * tilePixels) - 13) / 16;

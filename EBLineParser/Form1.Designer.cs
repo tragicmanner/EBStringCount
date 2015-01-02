@@ -108,10 +108,11 @@
             this.testFontsBut.Enabled = false;
             this.testFontsBut.Location = new System.Drawing.Point(26, 141);
             this.testFontsBut.Name = "testFontsBut";
-            this.testFontsBut.Size = new System.Drawing.Size(75, 23);
+            this.testFontsBut.Size = new System.Drawing.Size(93, 23);
             this.testFontsBut.TabIndex = 7;
-            this.testFontsBut.Text = "Test Fonts";
+            this.testFontsBut.Text = "Visual Tester";
             this.testFontsBut.UseVisualStyleBackColor = true;
+            this.testFontsBut.Click += new System.EventHandler(this.testFontsBut_Click);
             // 
             // Form1
             // 
