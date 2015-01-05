@@ -62,6 +62,11 @@ namespace EBLineParser
             richTextBox1_TextChanged(sender, e);
         }
 
+        private void richTextBox1_SelectionChanged(object sender, EventArgs e)
+        {
+            selectedLengthValue.Text = localLine.calcStringSize(richTextBox1.SelectedText).ToString();
+        }
+
 
     }
 }

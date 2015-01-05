@@ -41,6 +41,8 @@
             this.overflowText = new System.Windows.Forms.TextBox();
             this.visualButton = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.selectedLengthValue = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -51,6 +53,7 @@
             this.richTextBox1.Size = new System.Drawing.Size(469, 82);
             this.richTextBox1.TabIndex = 0;
             this.richTextBox1.Text = "";
+            this.richTextBox1.SelectionChanged += new System.EventHandler(this.richTextBox1_SelectionChanged);
             this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
             // 
             // windowBox
@@ -93,7 +96,7 @@
             // lengthLabel
             // 
             this.lengthLabel.AutoSize = true;
-            this.lengthLabel.Location = new System.Drawing.Point(12, 183);
+            this.lengthLabel.Location = new System.Drawing.Point(12, 191);
             this.lengthLabel.Name = "lengthLabel";
             this.lengthLabel.Size = new System.Drawing.Size(70, 13);
             this.lengthLabel.TabIndex = 5;
@@ -102,7 +105,7 @@
             // totalLengthValue
             // 
             this.totalLengthValue.AutoSize = true;
-            this.totalLengthValue.Location = new System.Drawing.Point(95, 183);
+            this.totalLengthValue.Location = new System.Drawing.Point(105, 191);
             this.totalLengthValue.Name = "totalLengthValue";
             this.totalLengthValue.Size = new System.Drawing.Size(0, 13);
             this.totalLengthValue.TabIndex = 6;
@@ -128,7 +131,7 @@
             // rowsValue
             // 
             this.rowsValue.AutoSize = true;
-            this.rowsValue.Location = new System.Drawing.Point(95, 209);
+            this.rowsValue.Location = new System.Drawing.Point(105, 209);
             this.rowsValue.Name = "rowsValue";
             this.rowsValue.Size = new System.Drawing.Size(0, 13);
             this.rowsValue.TabIndex = 9;
@@ -158,11 +161,30 @@
             this.pictureBox1.TabIndex = 12;
             this.pictureBox1.TabStop = false;
             // 
+            // selectedLengthValue
+            // 
+            this.selectedLengthValue.AutoSize = true;
+            this.selectedLengthValue.Location = new System.Drawing.Point(105, 174);
+            this.selectedLengthValue.Name = "selectedLengthValue";
+            this.selectedLengthValue.Size = new System.Drawing.Size(0, 13);
+            this.selectedLengthValue.TabIndex = 14;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(12, 174);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(88, 13);
+            this.label2.TabIndex = 13;
+            this.label2.Text = "Selected Length:";
+            // 
             // VisualInterface
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(495, 296);
+            this.Controls.Add(this.selectedLengthValue);
+            this.Controls.Add(this.label2);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.visualButton);
             this.Controls.Add(this.overflowText);
@@ -200,5 +222,7 @@
         private System.Windows.Forms.TextBox overflowText;
         private System.Windows.Forms.Button visualButton;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Label selectedLengthValue;
+        private System.Windows.Forms.Label label2;
     }
 }
