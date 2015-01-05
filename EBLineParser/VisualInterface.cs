@@ -31,7 +31,9 @@ namespace EBLineParser
         {
             ArrayList rows = localLine.ParseString(richTextBox1.Text);
             int maxRows = localLine.getRowMax();
-            totalLengthValue.Text = localLine.calcStringSize(richTextBox1.Text).ToString();
+            // Here we calculate the number of pixels due to indents. One is subtracted to account for no forced indent on the first line
+            int indents = (rows.Count * localLine.getIndent()) - localLine.getIndent();
+            totalLengthValue.Text = (localLine.calcStringSize(richTextBox1.Text) + indents).ToString();
 
             if (rows.Count > maxRows)
             {
@@ -43,6 +45,7 @@ namespace EBLineParser
             else
             {
                 rowsValue.Text = rows.Count.ToString();
+                overflowText.Text = "";
             }
         }
 

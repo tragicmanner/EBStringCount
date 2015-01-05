@@ -126,6 +126,7 @@
             this.Controls.Add(this.ccsPathButton);
             this.Controls.Add(this.ccsPathBox);
             this.Name = "Form1";
+            this.Text = "EB Overflow Checker";
             this.ResumeLayout(false);
             this.PerformLayout();
 

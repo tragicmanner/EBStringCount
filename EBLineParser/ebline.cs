@@ -55,6 +55,8 @@ namespace EBLineParser
         private const int rowDefault = 132;
         //The normal width/height of a tile
         private const int tilePixels = 8;
+        // The amount of pixels we need to indent by if not the first line
+        private const int indent = 6;
 
         //The Maximum pixels you can have in an item name
         //private const int itemMax = 71;
@@ -78,6 +80,11 @@ namespace EBLineParser
             return coilPath;
         }
 
+        public int getIndent()
+        {
+            return indent;
+        }
+
         public int getNumFonts()
         {
             return AllWidths.Count;
@@ -97,7 +104,7 @@ namespace EBLineParser
         public void SetCurrentFont(int aFont)
         {
             fontNum = aFont;
-            calculateWindowSize(fontNum);
+            calculateWindowSize(1);
         }
 
         public void SetLogPath(string aPath)
@@ -174,15 +181,20 @@ namespace EBLineParser
         }
 
         //Returns the first string that cleanly fits on one line
-        public string lineExtractor(string aString)
+        public string lineExtractor(string aString, bool firstLine)
         {
-            if (calcStringSize(aString) >= lineSize &&
+            int padding = 0;
+
+            if (calcStringSize(aString) + padding > lineSize &&
                 !aString.Contains(' '))
             {
                 return "ERROR_LINE_OVERFLOW";
             }
 
-            if (calcStringSize(aString) < lineSize)
+            if (!firstLine)
+                padding = indent;
+
+            if (calcStringSize(aString) + padding < lineSize)
             {
                 return aString;
             }
@@ -193,11 +205,20 @@ namespace EBLineParser
                 string aWord = "";
                 bool lineNotFound = true;
 
+                // Remove spaces when wrapping to the next row just like the game does
+                if (!firstLine)
+                {
+                    while (tempString.IndexOf(' ') == 0)
+                    {
+                        tempString = tempString.Substring(1);
+                    }
+                }
+
                 while (lineNotFound && !tempString.Equals(""))
                 {
                     aWord = nextWord(tempString);
                     tempString = tempString.Substring(aWord.Length);
-                    if (calcStringSize(theLine + aWord) >= lineSize)
+                    if (calcStringSize(theLine + aWord) + padding > lineSize)
                     {
 
                         lineNotFound = false;
@@ -235,6 +256,7 @@ namespace EBLineParser
         public ArrayList ParseString(string text)
         {
             string tempString = text;
+            bool firstLine;
             ArrayList rows = new ArrayList();
 
             // Get rid of accented characters
@@ -245,7 +267,12 @@ namespace EBLineParser
 
             for (int i = 0; i < numRows; i++)
             {
-                rows.Add(lineExtractor(tempString));
+                if (i == 0)
+                    firstLine = true;
+                else
+                    firstLine = false;
+
+                rows.Add(lineExtractor(tempString, firstLine));
 
                 if (rows[i].ToString().Length > 0)
                     tempString = tempString.Substring(rows[i].ToString().Length);
@@ -451,6 +478,7 @@ namespace EBLineParser
             string fileName = "cssOverflow_" + DateTime.Now.ToString("MMyyHHmmss") + ".log";
             string fullFile = Path.Combine(logPath, fileName);
             string[] delimiters = new string[] { Environment.NewLine, "{wait}", "{prompt}", "{next}", "[03]" };
+            bool firstLine;
             CCSFiles = loadCCScriptFiles();
 
             StreamWriter sw = new StreamWriter(@fullFile, false);
@@ -485,7 +513,12 @@ namespace EBLineParser
 
                         for (int i = 0; i < numRows; i++)
                         {
-                            rows[i] = lineExtractor(tempString);
+                            if (i == 0)
+                                firstLine = true;
+                            else
+                                firstLine = false;
+
+                            rows[i] = lineExtractor(tempString, firstLine);
 
                             if (rows[i].Length > 0)
                                 tempString = tempString.Substring(rows[i].Length);
@@ -494,9 +527,18 @@ namespace EBLineParser
                             {
                                 i = numRows;
                             }
+
+                            if (calcStringSize(rows[i]) == lineSize)
+                            {
+                                sw.WriteLine("=====================");
+                                sw.WriteLine("File: " + kvp.Key);
+                                sw.WriteLine("Label: " + svp.Key);
+                                sw.WriteLine(string.Format("The following line is exactly {0} pixels long and may be followed by a blank line:", lineSize));
+                                sw.WriteLine(rows[i]);
+                            }
                         }
 
-                        if (lineExtractor(tempString).Length > 0)
+                        if (calcStringSize(tempString) > 0)
                         {
                             sw.WriteLine("=====================");
                             sw.WriteLine("File: " + kvp.Key);
@@ -665,7 +707,7 @@ namespace EBLineParser
                     windowStream.Close();
 
                     //22 is the number of pixels lost to indentation and window borders
-                    lineSize = ( windowWidth * tilePixels) - 22;
+                    lineSize = ( windowWidth * tilePixels) - 16;
 
                     //13 is the number of pixels lost to indentation and window borders
                     numRows = (( windowHeight * tilePixels) - 13) / 16;

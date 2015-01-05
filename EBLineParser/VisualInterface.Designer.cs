@@ -152,6 +152,7 @@
             this.visualButton.TabIndex = 11;
             this.visualButton.Text = "Visualize";
             this.visualButton.UseVisualStyleBackColor = true;
+            this.visualButton.Visible = false;
             // 
             // pictureBox1
             // 
