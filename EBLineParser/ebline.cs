@@ -527,15 +527,6 @@ namespace EBLineParser
                             {
                                 i = numRows;
                             }
-
-                            if (calcStringSize(rows[i]) == lineSize)
-                            {
-                                sw.WriteLine("=====================");
-                                sw.WriteLine("File: " + kvp.Key);
-                                sw.WriteLine("Label: " + svp.Key);
-                                sw.WriteLine(string.Format("The following line is exactly {0} pixels long and may be followed by a blank line:", lineSize));
-                                sw.WriteLine(rows[i]);
-                            }
                         }
 
                         if (calcStringSize(tempString) > 0)
