@@ -49,14 +49,21 @@ namespace EBLineParser
         Dictionary<string, Dictionary<string, string>> CCSFiles;
 
         //A string that contains all the characters, with the same order as AllChars
-        private const string AllCharsString =  " !\"#$%&'()*+,-./0123456789:;<=>?" + 
-            "@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~¬";
+        private string AllCharsString =  Properties.Settings.Default.fontString;
+        //A string that contains all the expanded font codes
+        private const string ExpandedCharsString = "" +
+        "[b0],[b1],[b2],[b3],[b4],[b5],[b6],[b7],[b8],[b9],[ba],[bb],[bc],[bd],[be],[bf]," +
+        "[c0],[c1],[c2],[c3],[c4],[c5],[c6],[c7],[c8],[c9],[ca],[cc],[cc],[cd],[ce],[cf]";
         //The Default pixels you can have in a row
         private const int rowDefault = 132;
         //The normal width/height of a tile
         private const int tilePixels = 8;
         // The amount of pixels we need to indent by if not the first line
         private const int indent = 6;
+        // The number of pixels wide an equippable item can be
+        private const int equip = 71;
+        // The number of pixels wide a normal item can be
+        private const int item = 80;
 
         //The Maximum pixels you can have in an item name
         //private const int itemMax = 71;
@@ -112,17 +119,21 @@ namespace EBLineParser
             logPath = aPath;
         }
 
+        //Reads all the item names from item_configuration_table.yml
+        public void readItems()
+        {
+
+        }
+
         //Reads all the characters and widths from the widths file
         public string readWidths()
         {
             string[] widthFiles = Directory.GetFiles(Path.Combine(coilPath, "Fonts"), "*.yml");
             AllWidths = new List<List<int>>();
-            AllChars = new char[96];
+            AllChars = AllCharsString.ToCharArray();
             string line = "";
             string subLine = "";
             string subLine2 = "";
-
-            AllChars = AllCharsString.ToCharArray();
 
             foreach (string aFile in widthFiles)
             {
@@ -163,12 +174,23 @@ namespace EBLineParser
         public int calcStringSize(string aString)
         {
             int totalSize = 0;
+            char c = ' ';
+            string expanded = "";
+            Regex expandedChar = new Regex("\\[[5-9A-Ca-c][0-9A-Fa-f]\\]");
 
             aString = RemoveDiacritics(aString);
 
-            foreach (char c in aString)
+            for (int i = 0; i < aString.Length; i++)
             {
-                if (AllCharsString.IndexOf(c) > -1)
+                c = aString.ToArray()[i];
+                if (i + 3 < aString.Length)
+                    expanded = aString.Substring(i,3);
+
+                if (expandedChar.IsMatch(expanded))
+                {
+                    totalSize += AllWidths[fontNum][Array.IndexOf(ExpandedCharsString.Split(','), expanded) + 96];
+                }
+                else if (AllCharsString.IndexOf(c) > -1)
                 {
                     //The size of the character being used
                     totalSize += AllWidths[fontNum][AllCharsString.IndexOf(c)];
@@ -335,10 +357,10 @@ namespace EBLineParser
             //Regex patterns to completely remove
             Regex controlCode = new Regex("(\\[[0-9A-Fa-f]{2}( [0-9A-Fa-f]{2})* |goto|call)" +
                 "((\\{e)*\\(.*\\)(\\})*)+(\\])*");
-            Regex rawCC = new Regex("\\[[ ]*([0-9A-Fa-f]{2}[ ]*?|\\{\\}[ ]*?)*\\]");
+            Regex rawCC = new Regex("\\[[ ]*?([1-4DEFdef][0-9A-Fa-f])[ ]*?([0-9A-Fa-f]{2}[ ]*?|\\{\\}[ ]*?)*\\]");
             Regex CCScript = new Regex("[a-z_]+\\([a-z_0-9.]+\\)");
             Regex CCScriptInline = new Regex("{[a-z_\\(\\)0-9 ]+}");
-            Regex extraCode = new Regex("\\[([0-9A-F]{2}[ ]*)+\\]");
+            Regex extraCode = new Regex("\\[([0-4DEFdef]{2}[ ]*)+\\]");
 
             if (aString.Replace("\"", "").Length >= 2)
             {

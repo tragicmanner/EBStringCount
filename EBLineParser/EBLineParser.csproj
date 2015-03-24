@@ -78,6 +78,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DefineString.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DefineString.Designer.cs">
+      <DependentUpon>DefineString.cs</DependentUpon>
+    </Compile>
     <Compile Include="ebline.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
@@ -99,6 +105,9 @@
     <Compile Include="Visualizer.Designer.cs">
       <DependentUpon>Visualizer.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="DefineString.resx">
+      <DependentUpon>DefineString.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

@@ -36,6 +36,10 @@
             this.ccsPathLabel = new System.Windows.Forms.Label();
             this.logPathLabel = new System.Windows.Forms.Label();
             this.testFontsBut = new System.Windows.Forms.Button();
+            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.textMenu = new System.Windows.Forms.ToolStripDropDownButton();
+            this.setTextValuesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // ccsPathBox
@@ -114,9 +118,38 @@
             this.testFontsBut.UseVisualStyleBackColor = true;
             this.testFontsBut.Click += new System.EventHandler(this.testFontsBut_Click);
             // 
+            // toolStrip1
+            // 
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.textMenu});
+            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
+            this.toolStrip1.Name = "toolStrip1";
+            this.toolStrip1.Size = new System.Drawing.Size(580, 25);
+            this.toolStrip1.TabIndex = 8;
+            this.toolStrip1.Text = "toolStrip1";
+            // 
+            // textMenu
+            // 
+            this.textMenu.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.textMenu.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.textMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setTextValuesToolStripMenuItem});
+            this.textMenu.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.textMenu.Name = "textMenu";
+            this.textMenu.Size = new System.Drawing.Size(42, 22);
+            this.textMenu.Text = "Text";
+            // 
+            // setTextValuesToolStripMenuItem
+            // 
+            this.setTextValuesToolStripMenuItem.Name = "setTextValuesToolStripMenuItem";
+            this.setTextValuesToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.setTextValuesToolStripMenuItem.Text = "Set Text Values";
+            this.setTextValuesToolStripMenuItem.Click += new System.EventHandler(this.setTextValuesToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(580, 176);
+            this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.testFontsBut);
             this.Controls.Add(this.logPathLabel);
             this.Controls.Add(this.ccsPathLabel);
@@ -127,6 +160,8 @@
             this.Controls.Add(this.ccsPathBox);
             this.Name = "Form1";
             this.Text = "EB Overflow Checker";
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -142,6 +177,9 @@
         private System.Windows.Forms.Label ccsPathLabel;
         private System.Windows.Forms.Label logPathLabel;
         private System.Windows.Forms.Button testFontsBut;
+        private System.Windows.Forms.ToolStrip toolStrip1;
+        private System.Windows.Forms.ToolStripDropDownButton textMenu;
+        private System.Windows.Forms.ToolStripMenuItem setTextValuesToolStripMenuItem;
 
     }
 }

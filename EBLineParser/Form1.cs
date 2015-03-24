@@ -114,5 +114,12 @@ namespace EBLineParser
             VisualInterface vis = new VisualInterface(lineCalc);
             vis.Show();
         }
+
+        private void setTextValuesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DefineString DefString = new DefineString();
+
+            DefString.Show();
+        }
     }
 }
