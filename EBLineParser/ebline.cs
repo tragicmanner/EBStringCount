@@ -44,6 +44,8 @@ namespace EBLineParser
         private char[] AllChars;
         //A list of all the widths, with the indexes corresponding with AllChars
         private List<List<int>> AllWidths;
+        //A dictionary of all the item names as keys and their types as values
+        Dictionary<string, string> AllItems;
 
         // The place we will keep all the ccs files
         Dictionary<string, Dictionary<string, string>> CCSFiles;
@@ -61,9 +63,9 @@ namespace EBLineParser
         // The amount of pixels we need to indent by if not the first line
         private const int indent = 6;
         // The number of pixels wide an equippable item can be
-        private const int equip = 71;
+        private const int equipSize = 71;
         // The number of pixels wide a normal item can be
-        private const int item = 80;
+        private const int itemSize = 79;
 
         //The Maximum pixels you can have in an item name
         //private const int itemMax = 71;
@@ -120,9 +122,64 @@ namespace EBLineParser
         }
 
         //Reads all the item names from item_configuration_table.yml
-        public void readItems()
+        public string readItems()
         {
+            string itemPath = Path.Combine(coilPath, "item_configuration_table.yml");
+            string line = "";
+            string modifiedLine = "";
+            string typeValue = "";
+            int type = 0;
+            string warning = "";
+            AllItems = new Dictionary<string, string>();
 
+            try
+            {
+                using (StreamReader sr = new StreamReader(itemPath))
+                {
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        if (line.Contains("Name: "))
+                        {
+                            modifiedLine = line.Replace("  Name: ", "");
+                            modifiedLine = modifiedLine.Replace("\"", "");
+                            typeValue = sr.ReadLine();
+
+                            typeValue = typeValue.Replace("  Type: ", "");
+                            type = Convert.ToInt32(typeValue);
+
+                            if (type > 8 && type < 32)
+                            {
+                                try
+                                {
+                                    AllItems.Add(modifiedLine, "equip");
+                                }
+                                catch (System.ArgumentException e)
+                                {
+                                    // Do nothing, we will skip duplicates
+                                }
+
+                            }
+                            else
+                            {
+                                try
+                                {
+                                    AllItems.Add(modifiedLine, "normal");
+                                }
+                                catch (System.ArgumentException e)
+                                {
+                                    // Do Nothing, we'll skip any items with duplicate names
+                                }
+                                
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                return "" + e.Message + ": The file " + itemPath + " could not be read:";
+            }
+            return "";
         }
 
         //Reads all the characters and widths from the widths file
@@ -184,11 +241,14 @@ namespace EBLineParser
             {
                 c = aString.ToArray()[i];
                 if (i + 3 < aString.Length)
-                    expanded = aString.Substring(i,3);
+                    expanded = aString.Substring(i, 4);
+                else
+                    expanded = "";
 
                 if (expandedChar.IsMatch(expanded))
                 {
-                    totalSize += AllWidths[fontNum][Array.IndexOf(ExpandedCharsString.Split(','), expanded) + 96];
+                    totalSize += AllWidths[fontNum][Array.IndexOf(ExpandedCharsString.Split(','), expanded.ToLower()) + 96];
+                    i += 3;
                 }
                 else if (AllCharsString.IndexOf(c) > -1)
                 {
@@ -484,17 +544,27 @@ namespace EBLineParser
             return aString;
         }
 
-        public void startCCS(string a_ccsPath, string a_logPath)
+        public void startCCS(string a_coilPath, string a_logPath)
         {
             logPath = a_logPath;
-            coilPath = Path.Combine(a_ccsPath);
+            coilPath = Path.Combine(a_coilPath);
 
             calculateWindowSize(1);
 
-            readCCS();
+            logCCS();
         }
 
-        private void readCCS()
+        public void startItems(string a_coilPath, string a_logPath)
+        {
+            logPath = a_logPath;
+            coilPath = Path.Combine(a_coilPath);
+
+            calculateWindowSize(1);
+
+            logItems();
+        }
+
+        private void logCCS()
         {
             //Setup log file
             string fileName = "cssOverflow_" + DateTime.Now.ToString("MMyyHHmmss") + ".log";
@@ -564,6 +634,44 @@ namespace EBLineParser
                             sw.WriteLine("Excess Pixels: " + calcStringSize(tempString).ToString());
                         }
 
+                    }
+                }
+            }
+            sw.Close();
+        }
+
+        private void logItems()
+        {
+            //Setup log file
+            string fileName = "itemOverflow_" + DateTime.Now.ToString("MMyyHHmmss") + ".log";
+            string fullFile = Path.Combine(logPath, fileName);
+            string[] delimiters = new string[] { Environment.NewLine, "{wait}", "{prompt}", "{next}", "[03]" };
+
+            StreamWriter sw = new StreamWriter(@fullFile, false);
+
+            foreach (KeyValuePair<string, string> item in AllItems)
+            {
+                if (item.Value.Equals("normal"))
+                {
+                    if (calcStringSize(item.Key) > itemSize)
+                    {
+                        sw.WriteLine("=====================");
+                        sw.WriteLine("Item Name: " + item.Key);
+                        sw.WriteLine("Type: Non-Equipment");
+                        sw.WriteLine("Name Size: " + calcStringSize(item.Key).ToString());
+                        sw.WriteLine("Excess Pixels: " + (calcStringSize(item.Key) - itemSize).ToString());
+                    }
+                }
+
+                if (item.Value.Equals("equip"))
+                {
+                    if (calcStringSize(item.Key) > equipSize)
+                    {
+                        sw.WriteLine("=====================");
+                        sw.WriteLine("Item Name: " + item.Key);
+                        sw.WriteLine("Type: Equipment");
+                        sw.WriteLine("Name Size: " + calcStringSize(item.Key).ToString());
+                        sw.WriteLine("Excess Pixels: " + (calcStringSize(item.Key) - equipSize).ToString());
                     }
                 }
             }

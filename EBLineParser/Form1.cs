@@ -48,12 +48,18 @@ namespace EBLineParser
                 {
                     testFontsBut.Enabled = true;
                 }
+                string itemResult = lineCalc.readItems();
+                if (!itemResult.Equals(""))
+                {
+                    MessageBox.Show(itemResult, "ERROR");
+                }
             }
 
         }
 
         private void generateButton_Click(object sender, EventArgs e)
         {
+            this.Enabled = false;
             if (Directory.Exists(ccsPathBox.Text) &&
                 Directory.Exists(logPathBox.Text))
             {
@@ -63,9 +69,18 @@ namespace EBLineParser
                 {
                     MessageBox.Show(widthResult, "ERROR");
                 }
+
+                string itemResult = lineCalc.readItems();
+                if (!itemResult.Equals(""))
+                {
+                    MessageBox.Show(itemResult, "ERROR");
+                }
+
+                lineCalc.startItems(ccsPathBox.Text, logPathBox.Text);
                 lineCalc.startCCS(ccsPathBox.Text,logPathBox.Text);
                 MessageBox.Show("Report has been completed", "Complete");
             }
+            this.Enabled = true;
         }
 
         private void logPathButton_Click(object sender, EventArgs e)
@@ -82,11 +97,21 @@ namespace EBLineParser
 
         private void ccsPathBox_TextChanged(object sender, EventArgs e)
         {
+            if (String.IsNullOrEmpty(ccsPathBox.Text) || String.IsNullOrEmpty(logPathBox.Text))
+                generateButton.Enabled = false;
+            else
+                generateButton.Enabled = true;
+
             lineCalc.SetCoilPath(ccsPathBox.Text);
         }
 
         private void logPathBox_TextChanged(object sender, EventArgs e)
         {
+            if (String.IsNullOrEmpty(ccsPathBox.Text) || String.IsNullOrEmpty(logPathBox.Text))
+                generateButton.Enabled = false;
+            else
+                generateButton.Enabled = true;
+
             lineCalc.SetLogPath(logPathBox.Text);
         }
 
@@ -105,6 +130,12 @@ namespace EBLineParser
                 else
                 {
                     testFontsBut.Enabled = true;
+                }
+
+                string itemResult = lineCalc.readItems();
+                if (!itemResult.Equals(""))
+                {
+                    MessageBox.Show(itemResult, "ERROR");
                 }
             }
         }

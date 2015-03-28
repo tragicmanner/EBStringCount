@@ -48,6 +48,7 @@
             // 
             // richTextBox1
             // 
+            this.richTextBox1.DetectUrls = false;
             this.richTextBox1.Location = new System.Drawing.Point(12, 12);
             this.richTextBox1.Name = "richTextBox1";
             this.richTextBox1.Size = new System.Drawing.Size(469, 82);
@@ -96,7 +97,7 @@
             // lengthLabel
             // 
             this.lengthLabel.AutoSize = true;
-            this.lengthLabel.Location = new System.Drawing.Point(12, 191);
+            this.lengthLabel.Location = new System.Drawing.Point(12, 198);
             this.lengthLabel.Name = "lengthLabel";
             this.lengthLabel.Size = new System.Drawing.Size(70, 13);
             this.lengthLabel.TabIndex = 5;
@@ -113,7 +114,7 @@
             // rowLabel
             // 
             this.rowLabel.AutoSize = true;
-            this.rowLabel.Location = new System.Drawing.Point(12, 209);
+            this.rowLabel.Location = new System.Drawing.Point(12, 219);
             this.rowLabel.Name = "rowLabel";
             this.rowLabel.Size = new System.Drawing.Size(74, 13);
             this.rowLabel.TabIndex = 7;
@@ -122,7 +123,7 @@
             // overflowLabel
             // 
             this.overflowLabel.AutoSize = true;
-            this.overflowLabel.Location = new System.Drawing.Point(12, 233);
+            this.overflowLabel.Location = new System.Drawing.Point(12, 265);
             this.overflowLabel.Name = "overflowLabel";
             this.overflowLabel.Size = new System.Drawing.Size(76, 13);
             this.overflowLabel.TabIndex = 8;
@@ -138,7 +139,7 @@
             // 
             // overflowText
             // 
-            this.overflowText.Location = new System.Drawing.Point(98, 230);
+            this.overflowText.Location = new System.Drawing.Point(98, 262);
             this.overflowText.Name = "overflowText";
             this.overflowText.ReadOnly = true;
             this.overflowText.Size = new System.Drawing.Size(383, 20);
@@ -146,7 +147,7 @@
             // 
             // visualButton
             // 
-            this.visualButton.Location = new System.Drawing.Point(408, 261);
+            this.visualButton.Location = new System.Drawing.Point(408, 286);
             this.visualButton.Name = "visualButton";
             this.visualButton.Size = new System.Drawing.Size(75, 23);
             this.visualButton.TabIndex = 11;
@@ -156,9 +157,9 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(225, 109);
+            this.pictureBox1.Location = new System.Drawing.Point(225, 100);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(256, 96);
+            this.pictureBox1.Size = new System.Drawing.Size(256, 135);
             this.pictureBox1.TabIndex = 12;
             this.pictureBox1.TabStop = false;
             // 
@@ -173,7 +174,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 174);
+            this.label2.Location = new System.Drawing.Point(12, 178);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(88, 13);
             this.label2.TabIndex = 13;
@@ -183,7 +184,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(495, 296);
+            this.ClientSize = new System.Drawing.Size(495, 322);
             this.Controls.Add(this.selectedLengthValue);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.pictureBox1);

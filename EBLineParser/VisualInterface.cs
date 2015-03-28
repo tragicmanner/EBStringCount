@@ -29,11 +29,12 @@ namespace EBLineParser
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
-            ArrayList rows = localLine.ParseString(richTextBox1.Text);
+            string plainLine = richTextBox1.Text;
+            ArrayList rows = localLine.ParseString(plainLine);
             int maxRows = localLine.getRowMax();
             // Here we calculate the number of pixels due to indents. One is subtracted to account for no forced indent on the first line
             int indents = (rows.Count * localLine.getIndent()) - localLine.getIndent();
-            totalLengthValue.Text = (localLine.calcStringSize(richTextBox1.Text) + indents).ToString();
+            totalLengthValue.Text = (localLine.calcStringSize(plainLine) + indents).ToString();
 
             if (rows.Count > maxRows)
             {
@@ -69,7 +70,6 @@ namespace EBLineParser
         {
             selectedLengthValue.Text = localLine.calcStringSize(richTextBox1.SelectedText).ToString();
         }
-
 
     }
 }
