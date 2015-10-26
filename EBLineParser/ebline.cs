@@ -191,6 +191,7 @@ namespace EBLineParser
             string line = "";
             string subLine = "";
             string subLine2 = "";
+            string lineComment = "#.*";
 
             foreach (string aFile in widthFiles)
             {
@@ -201,6 +202,7 @@ namespace EBLineParser
                     {
                         while ((line = sr.ReadLine()) != null)
                         {
+                            line = Regex.Replace(line, lineComment, ""); // Removing single-line comments
                             if (line.Contains("::"))
                             {
                                 subLine2 = line.Substring(line.IndexOf(':') + 1, line.Length - (line.IndexOf(':') + 1));
@@ -737,7 +739,12 @@ namespace EBLineParser
             var CCSFiles = new Dictionary<string, Dictionary<string, string>>();
             string[] dataFiles = Directory.GetFiles(coilPath, "ccscript\\*.ccs");
             string aLabel = "";
-            Regex label = new Regex("^[a-zA-Z]+[_a-zA-Z0-9]*:");
+            Regex label = new Regex("^[^0-9]\\S*:");
+            Regex commentBlockStart = new Regex("\\/\\*");
+            Regex commentBlockEnd = new Regex("\\*\\/");
+            string upUntilBlockEnd = ".*\\*\\/";
+            string afterBlockStart = "\\/\\*.*";
+            bool inCommentBlock = false;
 
             foreach (string aFile in dataFiles)
             {
@@ -752,9 +759,24 @@ namespace EBLineParser
 
                 while (!sr.EndOfStream)
                 {
-                    if (label.Match(curString).Success)
+                    if (commentBlockStart.Match(curString).Success | inCommentBlock)
                     {
-                        aLabel = curString.Replace(":", "");
+                        if(commentBlockStart.Match(curString).Success && !inCommentBlock)
+                        {
+                            inCommentBlock = true;
+                            curString = Regex.Replace(curString, afterBlockStart, "");
+                        }
+                        if (commentBlockEnd.Match(curString).Success && inCommentBlock)
+                        {
+                            inCommentBlock = false;
+                            curString = Regex.Replace(curString, upUntilBlockEnd, "");
+                        }
+                    }
+                    Match match = label.Match(curString);
+                    if (match.Success)
+                    {
+                        aLabel = match.Value;
+                        aLabel = aLabel.Replace(":", "");
                         curString = sr.ReadLine();
                         string content = "";
 
@@ -763,7 +785,14 @@ namespace EBLineParser
                             content += curString + Environment.NewLine;
                             curString = sr.ReadLine();
                         }
-                        CCSFiles[fileName].Add(aLabel, content);
+                        try
+                        {
+                            CCSFiles[fileName].Add(aLabel, content);
+                        }
+                        catch (ArgumentException ex)
+                        {
+                            // Skip the duplicate
+                        }
                     }
                     else
                     {
