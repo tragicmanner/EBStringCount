@@ -97,7 +97,7 @@
             // lengthLabel
             // 
             this.lengthLabel.AutoSize = true;
-            this.lengthLabel.Location = new System.Drawing.Point(12, 198);
+            this.lengthLabel.Location = new System.Drawing.Point(12, 215);
             this.lengthLabel.Name = "lengthLabel";
             this.lengthLabel.Size = new System.Drawing.Size(70, 13);
             this.lengthLabel.TabIndex = 5;
@@ -106,7 +106,7 @@
             // totalLengthValue
             // 
             this.totalLengthValue.AutoSize = true;
-            this.totalLengthValue.Location = new System.Drawing.Point(105, 191);
+            this.totalLengthValue.Location = new System.Drawing.Point(105, 215);
             this.totalLengthValue.Name = "totalLengthValue";
             this.totalLengthValue.Size = new System.Drawing.Size(0, 13);
             this.totalLengthValue.TabIndex = 6;
@@ -114,7 +114,7 @@
             // rowLabel
             // 
             this.rowLabel.AutoSize = true;
-            this.rowLabel.Location = new System.Drawing.Point(12, 219);
+            this.rowLabel.Location = new System.Drawing.Point(12, 236);
             this.rowLabel.Name = "rowLabel";
             this.rowLabel.Size = new System.Drawing.Size(74, 13);
             this.rowLabel.TabIndex = 7;
@@ -132,7 +132,7 @@
             // rowsValue
             // 
             this.rowsValue.AutoSize = true;
-            this.rowsValue.Location = new System.Drawing.Point(105, 209);
+            this.rowsValue.Location = new System.Drawing.Point(105, 236);
             this.rowsValue.Name = "rowsValue";
             this.rowsValue.Size = new System.Drawing.Size(0, 13);
             this.rowsValue.TabIndex = 9;
@@ -166,7 +166,7 @@
             // selectedLengthValue
             // 
             this.selectedLengthValue.AutoSize = true;
-            this.selectedLengthValue.Location = new System.Drawing.Point(105, 174);
+            this.selectedLengthValue.Location = new System.Drawing.Point(105, 195);
             this.selectedLengthValue.Name = "selectedLengthValue";
             this.selectedLengthValue.Size = new System.Drawing.Size(0, 13);
             this.selectedLengthValue.TabIndex = 14;
@@ -174,7 +174,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 178);
+            this.label2.Location = new System.Drawing.Point(12, 195);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(88, 13);
             this.label2.TabIndex = 13;

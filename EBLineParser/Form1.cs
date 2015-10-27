@@ -21,12 +21,14 @@ namespace EBLineParser
         {
             lineCalc = new ebline();
             InitializeComponent();
+            reportDropdown.SelectedIndex = 0;
         }
 
         public Form1(int aSize)
         {
             lineCalc = new ebline(aSize);
             InitializeComponent();
+            reportDropdown.SelectedIndex = 0;
         }
 
         private void ccsPathButton_Click(object sender, EventArgs e)
@@ -76,8 +78,19 @@ namespace EBLineParser
                     MessageBox.Show(itemResult, "ERROR");
                 }
 
-                lineCalc.startItems(ccsPathBox.Text, logPathBox.Text);
-                lineCalc.startCCS(ccsPathBox.Text,logPathBox.Text);
+                if (reportDropdown.SelectedIndex == 0)
+                {
+                    lineCalc.startItems(ccsPathBox.Text, logPathBox.Text);
+                    lineCalc.startCCS(ccsPathBox.Text, logPathBox.Text);
+                }
+                else if (reportDropdown.SelectedIndex == 1)
+                {
+                    lineCalc.startCCS(ccsPathBox.Text, logPathBox.Text);
+                }
+                else
+                {
+                    lineCalc.startItems(ccsPathBox.Text, logPathBox.Text);
+                }
                 MessageBox.Show("Report has been completed", "Complete");
             }
             this.Enabled = true;

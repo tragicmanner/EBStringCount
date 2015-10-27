@@ -54,10 +54,16 @@ namespace EBLineParser
         private string AllCharsString =  Properties.Settings.Default.fontString;
         //A string that contains all the expanded font codes
         private const string ExpandedCharsString = "" +
+        "[50],[51],[52],[53],[54],[55],[56],[57],[58],[59],[5a],[5b],[5c],[5d],[5e],[5f]," +
+        "[60],[61],[62],[63],[64],[66],[66],[67],[68],[69],[6a],[6b],[6c],[6d],[6e],[6f]," +
+        "[70],[71],[72],[73],[74],[75],[76],[77],[78],[79],[7a],[7b],[7c],[7d],[7e],[7f]," +
+        "[80],[81],[82],[83],[84],[85],[86],[87],[88],[89],[8a],[8b],[8c],[8d],[8e],[8f]," +
+        "[90],[91],[92],[93],[94],[95],[96],[97],[98],[99],[9a],[9b],[9c],[9d],[9e],[9f]," +
+        "[a0],[a1],[a2],[a3],[a4],[a5],[a6],[a7],[a8],[a9],[aa],[ab],[ac],[ad],[ae],[af]," +
         "[b0],[b1],[b2],[b3],[b4],[b5],[b6],[b7],[b8],[b9],[ba],[bb],[bc],[bd],[be],[bf]," +
-        "[c0],[c1],[c2],[c3],[c4],[c5],[c6],[c7],[c8],[c9],[ca],[cc],[cc],[cd],[ce],[cf]";
+        "[c0],[c1],[c2],[c3],[c4],[c5],[c6],[c7],[c8],[c9],[ca],[cb],[cc],[cd],[ce],[cf]";
         //The Default pixels you can have in a row
-        private const int rowDefault = 132;
+        private const int rowDefault = 136;
         //The normal width/height of a tile
         private const int tilePixels = 8;
         // The amount of pixels we need to indent by if not the first line
@@ -130,6 +136,10 @@ namespace EBLineParser
             string typeValue = "";
             int type = 0;
             string warning = "";
+            string lineComment = "#.*";
+            string lineComment2 = "\\/\\/.*";
+            string namePattern = "\\s*Name:\\s*";
+            string typePattern = "\\s*Type:\\s*";
             AllItems = new Dictionary<string, string>();
 
             try
@@ -138,13 +148,15 @@ namespace EBLineParser
                 {
                     while ((line = sr.ReadLine()) != null)
                     {
+                        line = Regex.Replace(line, lineComment, ""); // Removing single-line comments
+                        line = Regex.Replace(line, lineComment2, ""); // Removing single-line comments
                         if (line.Contains("Name: "))
                         {
-                            modifiedLine = line.Replace("  Name: ", "");
+                            modifiedLine = Regex.Replace(line, namePattern, "");
                             modifiedLine = modifiedLine.Replace("\"", "");
                             typeValue = sr.ReadLine();
 
-                            typeValue = typeValue.Replace("  Type: ", "");
+                            typeValue = Regex.Replace(typeValue, typePattern, "");
                             type = Convert.ToInt32(typeValue);
 
                             if (type > 8 && type < 32)
@@ -249,7 +261,7 @@ namespace EBLineParser
 
                 if (expandedChar.IsMatch(expanded))
                 {
-                    totalSize += AllWidths[fontNum][Array.IndexOf(ExpandedCharsString.Split(','), expanded.ToLower()) + 96];
+                    totalSize += AllWidths[fontNum][Array.IndexOf(ExpandedCharsString.Split(','), expanded.ToLower())];
                     i += 3;
                 }
                 else if (AllCharsString.IndexOf(c) > -1)
@@ -292,10 +304,7 @@ namespace EBLineParser
                 // Remove spaces when wrapping to the next row just like the game does
                 if (!firstLine)
                 {
-                    while (tempString.IndexOf(' ') == 0)
-                    {
-                        tempString = tempString.Substring(1);
-                    }
+                    tempString = tempString.TrimStart();
                 }
 
                 while (lineNotFound && !tempString.Equals(""))
@@ -359,7 +368,7 @@ namespace EBLineParser
                 rows.Add(lineExtractor(tempString, firstLine));
 
                 if (rows[i].ToString().Length > 0)
-                    tempString = tempString.Substring(rows[i].ToString().Length);
+                    tempString = tempString.Substring(rows[i].ToString().Length).TrimStart();
 
                 if (tempString.Length == 0)
                 {
@@ -378,14 +387,14 @@ namespace EBLineParser
 
             Regex charCode = new Regex("\\[[aA5-9][a-fA-F0-9]\\]");
 
-            // Replace character codes
+            /* Replace character codes
             foreach (Match match in charCode.Matches(normalizedString))
             {
                 if (match.Success)
                 {
                     normalizedString = normalizedString.Replace(match.Value, AllCharsString[AllCharsString.IndexOf(AllChars.Max())].ToString());
                 }
-            }
+            }*/
 
             foreach (var c in normalizedString)
             {
@@ -595,10 +604,7 @@ namespace EBLineParser
                         string tempString = curString;
 
                         // Get rid of leading spaces from line indentation
-                        while (tempString.IndexOf(' ') == 0)
-                        {
-                            tempString = tempString.Substring(1);
-                        }
+                        tempString = tempString.TrimStart();
                         // Get rid of accented characters
                         tempString = RemoveDiacritics(tempString);
 
@@ -615,7 +621,7 @@ namespace EBLineParser
                             rows[i] = lineExtractor(tempString, firstLine);
 
                             if (rows[i].Length > 0)
-                                tempString = tempString.Substring(rows[i].Length);
+                                tempString = tempString.Substring(rows[i].Length).TrimStart();
 
                             if (tempString.Length == 0)
                             {
@@ -809,12 +815,15 @@ namespace EBLineParser
             string aPath = Path.Combine(coilPath, "item_configuration_table.yml");
             string curLine = "";
             string name = "Name:";
+            string lineComment = "#.*";
+            string lineComment2 = "\\/\\/.*";
             StreamReader itemStream = new StreamReader(aPath);
 
             while (!itemStream.EndOfStream)
             {
                 curLine = itemStream.ReadLine();
-
+                curLine = Regex.Replace(curLine, lineComment, ""); // Removing single-line comments
+                curLine = Regex.Replace(curLine, lineComment2, ""); // Removing single-line comments
                 if(curLine.Equals(aNum + ":"))
                 {
                     while (!itemStream.EndOfStream)

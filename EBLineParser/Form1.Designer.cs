@@ -39,6 +39,7 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.textMenu = new System.Windows.Forms.ToolStripDropDownButton();
             this.setTextValuesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reportDropdown = new System.Windows.Forms.ComboBox();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -147,9 +148,23 @@
             this.setTextValuesToolStripMenuItem.Text = "Set Text Values";
             this.setTextValuesToolStripMenuItem.Click += new System.EventHandler(this.setTextValuesToolStripMenuItem_Click);
             // 
+            // reportDropdown
+            // 
+            this.reportDropdown.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.reportDropdown.FormattingEnabled = true;
+            this.reportDropdown.Items.AddRange(new object[] {
+            "Full Report",
+            "CCScript Only",
+            "Items Only"});
+            this.reportDropdown.Location = new System.Drawing.Point(316, 143);
+            this.reportDropdown.Name = "reportDropdown";
+            this.reportDropdown.Size = new System.Drawing.Size(121, 21);
+            this.reportDropdown.TabIndex = 9;
+            // 
             // Form1
             // 
             this.ClientSize = new System.Drawing.Size(580, 176);
+            this.Controls.Add(this.reportDropdown);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.testFontsBut);
             this.Controls.Add(this.logPathLabel);
@@ -181,6 +196,7 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripDropDownButton textMenu;
         private System.Windows.Forms.ToolStripMenuItem setTextValuesToolStripMenuItem;
+        private System.Windows.Forms.ComboBox reportDropdown;
 
     }
 }
